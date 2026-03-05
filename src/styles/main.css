@@ -1,0 +1,46 @@
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg-main: #FFF7ED;
+  --text-dark: #4A2E1F;
+  --text-secondary: #70594A;
+  --radius: 20px;
+  --transition: 0.2s ease;
+  --container-width: 1200px;
+}
+
+html {
+scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg-main);
+  font-family: "Inter", sans-serif;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 150px;
+  margin-top: 130px;
+  margin-bottom: 170px;
+  flex: 1;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+
+

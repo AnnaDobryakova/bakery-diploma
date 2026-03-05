@@ -1,49 +1,88 @@
 export const mockDataProducts = [
   {
     id: 1,
-    imageURL: '/bun_3.png',
+    imageURL: 'img/bun_1.png',
     name: "Булочка с корицей",
+    description: "Мука, масло, вода, молоко, дрожжи",
     category: "Выпечка",
-    price: 120,
+    price: 160,
     remainder: 23,
     updateDate: "2023-07-04",
-
+    weight: 120, 
+    nutrition: {
+      calories: 380,
+      proteins: 6,
+      fats: 18,
+      carbs: 48
+    }
   },
   {
     id: 2,
-    imageURL: '/bun_3.png',
+    imageURL: 'img/bun_2.png',
     name: "Хлеб ржаной",
+    description: "Мука, вода, соль, дрожжи",
     category: "Хлеб",
     price: 80,
     remainder: 10,
     updateDate: "2023-07-03",
+    weight: 500,
+    nutrition: {
+      calories: 210,
+      proteins: 6,
+      fats: 1,
+      carbs: 44
+    }
   },
   {
     id: 3,
-    imageURL: '/bun_3.png',
+    imageURL: 'img/bun_3.png',
     name: "Пирожное 'Наполеон'",
-    price: 150,
+    description: "Мука, масло, вода, молоко, дрожжи",
     category: "Пирожные",
+    price: 150,
     remainder: 1,
     updateDate: "2023-07-05",
+    weight: 150,
+    nutrition: {
+      calories: 420,
+      proteins: 5,
+      fats: 28,
+      carbs: 40
+    }
   },
   {
     id: 4,
-    imageURL: '/bun_3.png',
+    imageURL: 'img/bun_2.png',
     name: "Круассан с шоколадом",
+    description: "Мука, масло, вода, молоко, дрожжи",
     category: "Выпечка",
     price: 100,
     remainder: 10,
     updateDate: "2023-07-02",
+    weight: 90,
+    nutrition: {
+      calories: 410,
+      proteins: 7,
+      fats: 22,
+      carbs: 45
+    }
   },
   {
     id: 5,
-    imageURL: '/bun_3.png',
+    imageURL: 'img/bun_1.png',
     name: "Маффин с черникой",
+    description: "Мука, масло, вода, молоко, дрожжи",
     category: "Пирожные",
     price: 130,
     remainder: 0,
     updateDate: "2023-07-01",
+    weight: 110,
+    nutrition: {
+      calories: 390,
+      proteins: 5,
+      fats: 19,
+      carbs: 52
+    }
   },
 ];
 

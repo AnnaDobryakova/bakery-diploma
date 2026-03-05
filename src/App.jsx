@@ -10,11 +10,13 @@ import AdminCategories from "./admin/pages/AdminCategories";
 import AdminPromotions from "./admin/pages/promotions/AdminPromotions";
 import AdminReports from "./admin/pages/AdminReports";
 import AdminEmployeeForm from "./admin/pages/employees/AdminEmployeeForm";
+import MenuPage from "./pages/MenuPage";
 
 export default function App() {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
+      <Route path="/menu" element={<MenuPage />} />
 
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<Navigate to="/admin/dashboard" replace />} />
