@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import { useEffect, useState } from 'react';
 import HomePage from "./pages/HomePage";
 import AdminLayout from "./admin/AdminLayout";
 import Dashboard from "./admin/pages/Dashboard";
@@ -10,13 +11,78 @@ import AdminCategories from "./admin/pages/AdminCategories";
 import AdminPromotions from "./admin/pages/promotions/AdminPromotions";
 import AdminReports from "./admin/pages/AdminReports";
 import AdminEmployeeForm from "./admin/pages/employees/AdminEmployeeForm";
+import NotFoundPage from "./pages/NotFoundPage";
 import MenuPage from "./pages/MenuPage";
+import AccountPage from "./pages/AccountPage";
+import OrderSuccessPage from "./pages/OrderSuccessPage";
 
 export default function App() {
+    const [cartItems, setCartItems] = useState(() => {
+      const savedCart = localStorage.getItem('cart');
+      return savedCart ? JSON.parse(savedCart) : [];
+    });
+
+    useEffect(() => {
+      localStorage.setItem('cart', JSON.stringify(cartItems));
+    }, [cartItems]);
+
+    const addToCart = (product) => {
+      setCartItems((prevCart) => {
+        const existingItem = prevCart.find((item) => item.id === product.id);
+
+        if (existingItem) {
+          return prevCart.map((item) =>
+            item.id === product.id
+              ? { ...item, quantity: item.quantity + 1 }
+              : item
+          );
+        }
+
+        return [...prevCart, { ...product, quantity: 1 }];
+      });
+    };
+
+      const removeFromCart = (productId) => {
+        setCartItems((prevCart) => prevCart.filter((item) => item.id !== productId));
+        };
+
+          const changeQuantity = (productId, delta) => {
+            setCartItems((prevCart) =>
+              prevCart
+                .map((item) =>
+                  item.id === productId
+                    ? { ...item, quantity: item.quantity + delta }
+                    : item
+                )
+                .filter((item) => item.quantity > 0)
+            );
+          };
+
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
-      <Route path="/menu" element={<MenuPage />} />
+      <Route path="/menu" element={
+        <MenuPage 
+          cartItems={cartItems}
+          addToCart={addToCart}
+          removeFromCart={removeFromCart}
+          changeQuantity={changeQuantity}
+        />
+      } />
+      <Route
+        path="/menu/:id"
+        element={
+          <MenuPage
+            cartItems={cartItems}
+            addToCart={addToCart}
+            removeFromCart={removeFromCart}
+            changeQuantity={changeQuantity}
+          />
+        }
+      />
+      <Route path="/account" element={<AccountPage />} />
+      <Route path="/order/success" element={<OrderSuccessPage />} />
+      <Route path="*" element={<NotFoundPage />} />
 
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<Navigate to="/admin/dashboard" replace />} />
@@ -30,8 +96,6 @@ export default function App() {
         <Route path="promotions" element={<AdminPromotions />} />
         <Route path="reports" element={<AdminReports />} />
       </Route>
-
-      <Route path="*" element={<div style={{ padding: 24 }}>404</div>} />
     </Routes>
   );
 }

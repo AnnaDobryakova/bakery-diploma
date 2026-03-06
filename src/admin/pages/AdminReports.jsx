@@ -4,9 +4,9 @@ import BarChart from "../components/BarChart";
 import PieChart from "../components/PieChart";
 import LineChart from "../components/LineChart";
 import { exportToCsv } from "../utils/exportToCsv";
-import { mockBarData } from "../data/mockData";
-import { mockPieData } from "../data/mockData";
-import { mockLineData } from "../data/mockData";
+import { mockBarData } from "../../data/mockData";
+import { mockPieData } from "../../data/mockData";
+import { mockLineData } from "../../data/mockData";
 import Button from "@mui/material/Button";
 import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
 

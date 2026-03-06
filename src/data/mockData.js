@@ -1,7 +1,7 @@
 export const mockDataProducts = [
   {
     id: 1,
-    imageURL: 'img/bun_1.png',
+    imageURL: '/img/bun_1.png',
     name: "Булочка с корицей",
     description: "Мука, масло, вода, молоко, дрожжи",
     category: "Выпечка",
@@ -18,7 +18,7 @@ export const mockDataProducts = [
   },
   {
     id: 2,
-    imageURL: 'img/bun_2.png',
+    imageURL: '/img/bun_2.png',
     name: "Хлеб ржаной",
     description: "Мука, вода, соль, дрожжи",
     category: "Хлеб",
@@ -35,7 +35,7 @@ export const mockDataProducts = [
   },
   {
     id: 3,
-    imageURL: 'img/bun_3.png',
+    imageURL: '/img/bun_3.png',
     name: "Пирожное 'Наполеон'",
     description: "Мука, масло, вода, молоко, дрожжи",
     category: "Пирожные",
@@ -52,7 +52,7 @@ export const mockDataProducts = [
   },
   {
     id: 4,
-    imageURL: 'img/bun_2.png',
+    imageURL: '/img/bun_2.png',
     name: "Круассан с шоколадом",
     description: "Мука, масло, вода, молоко, дрожжи",
     category: "Выпечка",
@@ -69,7 +69,7 @@ export const mockDataProducts = [
   },
   {
     id: 5,
-    imageURL: 'img/bun_1.png',
+    imageURL: '/img/bun_1.png',
     name: "Маффин с черникой",
     description: "Мука, масло, вода, молоко, дрожжи",
     category: "Пирожные",

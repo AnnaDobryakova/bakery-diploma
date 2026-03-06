@@ -11,7 +11,7 @@ import BarChart from "../components/BarChart";
 import PieChart from "../components/PieChart";
 import StatBox from "../components/StatBox";
 import ProgressCircle from "../components/ProgressCircle";
-import { mockTransactions } from "../data/mockData";
+import { mockTransactions } from "../../data/mockData";
 
 const Dashboard = () => {
     const theme = useTheme();

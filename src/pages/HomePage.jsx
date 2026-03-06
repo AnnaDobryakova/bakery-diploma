@@ -1,15 +1,22 @@
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+import Header from "../components/Header/Header";
+import Footer from "../components/Footer/Footer";
 import StarIcon from '@mui/icons-material/Star';
 import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import "../styles/main.css";
 import "../styles/components.css";
+import { useState } from "react";
 
 const HomePage = () => {
+
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    
+    const handleNavClick = () => setIsMenuOpen(false)
+
+
   return (
     <div>
-      <Header />
+      <Header cartItems={cartItems}/>
       <section className="hero">
         <div className="hero_inner container">
             <div className="hero__content">
@@ -77,19 +84,25 @@ const HomePage = () => {
                         <img src="/img/bun_1.png" alt="bun_1"/>
                         <h4 className="gallery_title">Булочка</h4>
                         <p className="gallery_subtitle">60 руб.</p>
-                        <button className="button button_gallery">Перейти в каталог</button>
+                        <button className="button button_gallery" onClick={handleNavClick}>
+                            <a href="/menu" style={{textDecoration: 'none', color: 'white'}}>Перейти в каталог</a>
+                        </button>
                     </div>
                     <div className="gallery_card" data-index="1">
                         <img src="/img/bun_2.png" alt="bun_2"/> 
                         <h4 className="gallery_title">Булочка</h4>
                         <p className="gallery_subtitle">60 руб.</p>
-                        <button className="button button_gallery">Перейти в каталог</button>
+                        <button className="button button_gallery" onClick={handleNavClick}>
+                            <a href="/menu" style={{textDecoration: 'none', color: 'white'}}>Перейти в каталог</a>
+                        </button>
                     </div>
                     <div className="gallery_card" data-index="2">
                         <img src="/img/bun_3.png" alt="bun_3"/>
                         <h4 className="gallery_title">Булочка</h4>
                         <p className="gallery_subtitle">60 руб.</p>
-                        <button className="button button_gallery">Перейти в каталог</button>
+                        <button className="button button_gallery" onClick={handleNavClick}>
+                            <a href="/menu" style={{textDecoration: 'none', color: 'white'}}>Перейти в каталог</a>
+                        </button>
                     </div>
                 </div>
                 <button className="gallery_arrow right">

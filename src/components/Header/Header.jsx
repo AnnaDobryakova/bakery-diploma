@@ -2,7 +2,8 @@ import { useState } from "react";
 import logo from "/img/logo.svg";
 import PersonIcon from '@mui/icons-material/Person';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import OrderModal from "./OrderModal";
+import CheckoutModal from "../../modals/CheckoutModal";
+
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -11,7 +12,6 @@ const Header = () => {
 
   const [openCheckout, setOpenCheckout] = useState(false);
 
-  const [productModalOpen, setProductModalOpen] = useState(false);
 
   const handleOpenCheckout = () => {
     setOpenCheckout(true);
@@ -132,18 +132,19 @@ const Header = () => {
               }} />
             </button>
 
-            <button className="btn" type="button" aria-label="Корзина" >
+            <button className="btn" type="button" aria-label="Корзина" /*</div>onClick={onCartClick}*/>
               <ShoppingCartIcon sx={{ fontSize: 30, cursor: 'pointer', color: 'white' }} />
             </button>
 
-            <button className="button" type="button" onClick={handleOpenCheckout}>
+            <button className="button" type="button" onClick={() => setOpenCheckout(true)}>
               Оформить заказ
             </button>
           </div>
         </div>
       </div>
     </header>
-    <OrderModal open={openCheckout} onClose={handleCloseCheckout} />
+    <CheckoutModal open={openCheckout} onClose={() => setOpenCheckout(false)}  />
+      {/* cartItems={cartItems} total={total} removeFromCart={removeFromCart} changeQuantity={changeQuantity} */}
     </>
     
   );

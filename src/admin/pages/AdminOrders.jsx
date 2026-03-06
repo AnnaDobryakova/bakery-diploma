@@ -3,7 +3,7 @@ import { Box, Typography, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 
 import { tokens } from "../../theme";
-import { mockDataOrders } from "../data/mockData";
+import { mockDataOrders } from "../../data/mockData";
 import Header from "../components/Header";
 
 const STATUS_ORDER = ["Новый", "Готовится", "Готово", "Отменён"];

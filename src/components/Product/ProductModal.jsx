@@ -1,11 +1,9 @@
-import { Modal, Box, Typography, Button } from '@mui/material';
-import { use, useState, useMemo } from 'react';
+import { Box, Typography, Button } from '@mui/material';
+import { useState, useMemo } from 'react';
+import ModalWrapper from '../../modals/ModalWrapper';
 
-
-const ProductModal = ({ product, open, handleClose }) => {
-
+const ProductModal = ({ product, open, onClose }) => {
     const [active, setActive] = useState('price');
-
     const [mode, setMode] = useState('per100');
 
     const nutrients = useMemo(() => {
@@ -32,28 +30,7 @@ const ProductModal = ({ product, open, handleClose }) => {
     
     if (!product || !nutrients) return null;
     return (
-        <>
-            <Modal
-            open={open}
-            onClose={handleClose}
-            aria-labelledby="product-title"
-            aria-describedby="product-description"
-            >
-            <Box sx={{
-                position: 'absolute',
-                display: 'flex',
-                flexDirection: 'row',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: 700,
-                bgcolor: 'background.paper',
-                borderRadius: '48px',
-                boxShadow: 24,
-                padding: '50px',
-                outline: 'none',
-                gap: '25px',
-             }}>
+            <ModalWrapper open={open} onClose={onClose} padding={'50px'}>
                 <Box sx={{objectFit: 'none',}}>
                     <img src={product.imageURL} alt={product.name}/>
                 </Box>
@@ -62,13 +39,13 @@ const ProductModal = ({ product, open, handleClose }) => {
                     width: '100%',
                 }}>
                     <Typography id="product-title" variant="h4" sx={{fontWeight: '600'}}>
-                    {product.name}
+                        {product.name}
                     </Typography>
                     <Typography variant='h5' sx={{ mt: 2, fontWeight: '600' }}>
                         Состав:
                     </Typography>
                     <Typography id="product-description" variant='h6' sx={{ mt: 2 }}>
-                    {product.description}
+                        {product.description}
                     </Typography>
                     <Typography variant='h5' sx={{ mt: 2, fontWeight: '600' }}>
                         Пищевая ценность
@@ -77,7 +54,6 @@ const ProductModal = ({ product, open, handleClose }) => {
                         display: 'flex', 
                         flexDirection: 'column',
                       }}>
-
                         <Box sx={{ display: 'flex', gap: 2, mt: 2,  flexDirection: 'row'}}>
                             <Button
                                 variant='contained'
@@ -97,68 +73,66 @@ const ProductModal = ({ product, open, handleClose }) => {
                                 color: active === 'all' ? '#ffffff' : '#9A9A9A',
                                 borderRadius: '64px',
                                 textTransform: 'initial',
-                            }}>Весь продукт ({product.weight} гр)</Button>
+                            }}>Весь продукт ({product.weight} гр)
+                            </Button>
                         </Box>
 
-                        <Box>
-                            <Box sx={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                            mt: 2
-                        }}>
-                            <Box sx={{
+                            <Box>
+                                <Box sx={{
                                 display: 'flex',
-                                flexDirection: 'column',
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                                mt: 2
                             }}>
-                                <Typography id="product-weight" variant='h6'>
-                                    {nutrients.calories}
-                                </Typography>
-                                <Typography id="product-weight">
-                                    ккал
-                                </Typography>
-                            </Box>
+                                <Box sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                }}>
+                                    <Typography id="product-weight" variant='h6'>
+                                        {nutrients.calories}
+                                    </Typography>
+                                    <Typography id="product-weight">
+                                        ккал
+                                    </Typography>
+                                </Box>
 
-                            <Box sx={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                            }}>
-                                <Typography id="product-weight" variant='h6'>
-                                    {nutrients.proteins}
-                                </Typography>
-                                <Typography id="product-weight" >
-                                    белки
-                                </Typography>
+                                <Box sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                }}>
+                                    <Typography id="product-weight" variant='h6'>
+                                        {nutrients.proteins}
+                                    </Typography>
+                                    <Typography id="product-weight" >
+                                        белки
+                                    </Typography>
+                                </Box>
+                                
+                                <Box sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                }}>
+                                    <Typography id="product-weight" variant='h6'>
+                                        {nutrients.carbs}
+                                    </Typography>
+                                    <Typography id="product-weight">
+                                        углеводы
+                                    </Typography>
+                                </Box>
+                                
+                                <Box sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                }}>
+                                    <Typography id="product-weight" variant='h6'>
+                                        {nutrients.fats}
+                                    </Typography>
+                                    <Typography id="product-weight">
+                                        жиры
+                                    </Typography>
+                                </Box>
                             </Box>
-                            
-                            <Box sx={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                            }}>
-                                <Typography id="product-weight" variant='h6'>
-                                    {nutrients.carbs}
-                                </Typography>
-                                <Typography id="product-weight">
-                                    углеводы
-                                </Typography>
-                            </Box>
-                            
-                            <Box sx={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                            }}>
-                                <Typography id="product-weight" variant='h6'>
-                                    {nutrients.fats}
-                                </Typography>
-                                <Typography id="product-weight">
-                                    жиры
-                                </Typography>
-                            </Box>
-
-                            
                         </Box>
-                        
-                    </Box>
                     </Box>
                     
                     <Box sx={{ display: 'flex', gap: 2, justifyContent: 'space-between', alignItems: 'center' }}>
@@ -169,7 +143,7 @@ const ProductModal = ({ product, open, handleClose }) => {
                             {product.price} ₽
                         </Typography>
                     </Box>
-                    <Button 
+                    <Button onClick={() => addToCart(product)}
                     variant='contained' 
                             sx={{
                                 backgroundColor: '#FD8719',
@@ -179,12 +153,10 @@ const ProductModal = ({ product, open, handleClose }) => {
                                 mt: 2
                                 
                             }}
-                    >Добавить в корзину</Button>
+                    >Добавить в корзину
+                    </Button>
                 </Box>
-
-            </Box>
-            </Modal>
-        </>
+            </ModalWrapper>
     );
 };
 

@@ -1,21 +1,20 @@
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+import Header from "../components/Header/Header";
+import Footer from "../components/Footer/Footer";
 import SearchIcon from '@mui/icons-material/Search';
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
-import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
-import ProductModal from "../components/ProductModal";
+import ProductCard from "../components/Product/ProductCard";
+import ProductModal from "../components/Product/ProductModal";
+import CheckoutModal from "../modals/CheckoutModal";
 import { useState } from "react";
-import { mockDataProducts } from "../admin/data/mockData";
+import { mockDataProducts } from "../data/mockData";
 import "../styles/main.css";
 import "../styles/components.css";
 import "../styles/menu_components.css";
-// import "../styles/product_modal.css";
 
-const MenuPage = () => {
+const MenuPage = ({ cartItems, addToCart, removeFromCart, changeQuantity }) => {
 
     const [productModalOpen, setProductModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
+    const [checkoutOpen, setCheckoutOpen] = useState(false);
 
     const handleProductClick = (product) => {
         setSelectedProduct(product);
@@ -27,10 +26,18 @@ const MenuPage = () => {
         setSelectedProduct(null);
     };
 
+    const handleOpenCheckout = () => {
+        setCheckoutOpen(true);
+    };
+
+    const handleCloseCheckout = () => {
+        setCheckoutOpen(false);
+    };
+
     
     return (
         <div>
-        <Header />
+        <Header onCartClick={handleOpenCheckout} cartItems={cartItems}/>
         
         <main> 
             <section className="menu">
@@ -49,35 +56,23 @@ const MenuPage = () => {
                     </button>
                 </div>
                 <div className="container">
-                    <div className="menu-cards">
-                        {mockDataProducts.map((product) => (
-                        <div className="menu_card" onClick={() => handleProductClick(product)}>
-                            <img src={product.imageURL} alt={product.name} />
-                            <div className="menu_block">
-                                <div className="menu_description">
-                                    <h4>{product.name}</h4>
-                                    <p>{product.description}</p>
-                                </div>
-                                <div className="menu_price">
-                                    <h5>{product.price}₽<span className="menu_span">/ 1 шт.</span></h5>
-                                    <button className="menu_count">
-                                        <button className="menu_btn"><RemoveIcon sx={{ fontSize: 20 }} /></button>
-                                        <span className="menu_number">0</span>
-                                        <button className="menu_btn"><AddIcon sx={{ fontSize: 20 }} /></button>
-                                    </button>
-                                    <button className="menu_cart">
-                                        <ShoppingBagIcon sx={{ color: 'white' }} />
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                    <div className="menu-cards" >
+                        { mockDataProducts.map((product)  => (
+                        <ProductCard onClick={() => handleProductClick(product)} key={product.id} product={product} addToCart={addToCart}/>
                         ))}
                     </div>
                 </div>
             </section>
         </main>
         <Footer />
-        <ProductModal open={productModalOpen} handleClose={handleCloseModal} product={selectedProduct} />
+        <ProductModal open={productModalOpen} onClose={handleCloseModal} product={selectedProduct} />
+        <CheckoutModal
+            open={checkoutOpen}
+            onClose={handleCloseCheckout}
+            cartItems={cartItems}
+            removeFromCart={removeFromCart}
+            changeQuantity={changeQuantity}
+        />
         </div>
     )
 }
