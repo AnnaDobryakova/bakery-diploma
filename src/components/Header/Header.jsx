@@ -2,16 +2,16 @@ import { useState } from "react";
 import logo from "/img/logo.svg";
 import PersonIcon from '@mui/icons-material/Person';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import CheckoutModal from "../../modals/CheckoutModal";
+import { Link } from "react-router-dom";
 
 
-const Header = () => {
+const Header = ({ onCartClick, cartItems = [] }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleNavClick = () => setIsMenuOpen(false);
 
-  const [openCheckout, setOpenCheckout] = useState(false);
-
+  // const [openCheckout, setOpenCheckout] = useState(false);
+  const totalCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const handleOpenCheckout = () => {
     setOpenCheckout(true);
@@ -112,11 +112,11 @@ const Header = () => {
           {/* Десктоп навигация */}
           <nav className="header_nav">
             <ul>
-              <li><a href="/">Главная</a></li>
-              <li><a href="#about">О нас</a></li>
-              <li><a href="/menu">Меню</a></li>
-              <li><a href="#reviews">Отзывы</a></li>
-              <li><a href="#promo">Акции</a></li>
+              <li><Link to="/">Главная</Link></li>
+              <li><Link to="/#about">О нас</Link></li>
+              <li><Link to="/menu">Меню</Link></li>
+              <li><Link to="/#promo">Акции</Link></li>
+              <li><Link to="/#reviews">Отзывы</Link></li>
             </ul>
           </nav>
 
@@ -132,19 +132,19 @@ const Header = () => {
               }} />
             </button>
 
-            <button className="btn" type="button" aria-label="Корзина" /*</div>onClick={onCartClick}*/>
+            <button className="btn" type="button" aria-label="Корзина" onClick={onCartClick}>
               <ShoppingCartIcon sx={{ fontSize: 30, cursor: 'pointer', color: 'white' }} />
+              {totalCount > 0 && <span style={{color: 'white'}}>{totalCount}</span>}
             </button>
 
-            <button className="button" type="button" onClick={() => setOpenCheckout(true)}>
+            <button className="button" type="button" onClick={onCartClick}>
               Оформить заказ
             </button>
           </div>
         </div>
       </div>
     </header>
-    <CheckoutModal open={openCheckout} onClose={() => setOpenCheckout(false)}  />
-      {/* cartItems={cartItems} total={total} removeFromCart={removeFromCart} changeQuantity={changeQuantity} */}
+    
     </>
     
   );

@@ -3,20 +3,44 @@ import Footer from "../components/Footer/Footer";
 import StarIcon from '@mui/icons-material/Star';
 import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import ProductModal from "../components/Product/ProductModal";
+import CheckoutModal from "../modals/CheckoutModal";
 import "../styles/main.css";
 import "../styles/components.css";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { mockDataProducts } from "../data/mockData";
 
-const HomePage = () => {
+const HomePage = ({ cartItems, removeFromCart, changeQuantity, clearCart }) => {
+    const products = mockDataProducts
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     
     const handleNavClick = () => setIsMenuOpen(false)
 
+    const [checkoutOpen, setCheckoutOpen] = useState(false);
+
+    const sliderRef = useRef(null);
+
+    const scrollLeft = () => {
+        sliderRef.current?.scrollBy({ left: -300, behavior: "smooth" });
+    };
+
+    const scrollRight = () => {
+        sliderRef.current?.scrollBy({ left: 300, behavior: "smooth" });
+    };
+
+    const handleOpenCheckout = () => {
+    setCheckoutOpen(true);
+    };
+
+    const handleCloseCheckout = () => {
+    setCheckoutOpen(false);
+    };
+
 
   return (
     <div>
-      <Header cartItems={cartItems}/>
+      <Header onCartClick={handleOpenCheckout} cartItems={cartItems}/>
       <section className="hero">
         <div className="hero_inner container">
             <div className="hero__content">
@@ -75,37 +99,23 @@ const HomePage = () => {
         </section>
         <section className="gallery container" id="menu">
             <h2>Что мы печем</h2>
-            <div className="gallery_container">
-                <button className="gallery_arrow left">
+            <div className="gallery_container gallery-wrapper">
+                <button className="gallery_arrow left" onClick={scrollLeft}>
                     <ArrowBackIosNewIcon sx={{ fontSize: 70 }} />
                 </button>
-                <div className="gallery_cards">
-                    <div className="gallery_card" data-index="0">
-                        <img src="/img/bun_1.png" alt="bun_1"/>
-                        <h4 className="gallery_title">Булочка</h4>
-                        <p className="gallery_subtitle">60 руб.</p>
-                        <button className="button button_gallery" onClick={handleNavClick}>
-                            <a href="/menu" style={{textDecoration: 'none', color: 'white'}}>Перейти в каталог</a>
-                        </button>
-                    </div>
-                    <div className="gallery_card" data-index="1">
-                        <img src="/img/bun_2.png" alt="bun_2"/> 
-                        <h4 className="gallery_title">Булочка</h4>
-                        <p className="gallery_subtitle">60 руб.</p>
-                        <button className="button button_gallery" onClick={handleNavClick}>
-                            <a href="/menu" style={{textDecoration: 'none', color: 'white'}}>Перейти в каталог</a>
-                        </button>
-                    </div>
-                    <div className="gallery_card" data-index="2">
-                        <img src="/img/bun_3.png" alt="bun_3"/>
-                        <h4 className="gallery_title">Булочка</h4>
-                        <p className="gallery_subtitle">60 руб.</p>
-                        <button className="button button_gallery" onClick={handleNavClick}>
-                            <a href="/menu" style={{textDecoration: 'none', color: 'white'}}>Перейти в каталог</a>
-                        </button>
-                    </div>
+                <div className="gallery_cards" ref={sliderRef}>
+                    {products.map((product) => (
+                        <div className="gallery_card" key={product.id}>
+                            <img src={product.imageURL} alt={product.name}/>
+                            <h4 className="gallery_title">{product.name}</h4>
+                            <p className="gallery_subtitle">{product.price} руб.</p>
+                            <button className="button button_gallery" onClick={handleNavClick}>
+                                <a href="/menu" style={{textDecoration: 'none', color: 'white'}}>Перейти в каталог</a>
+                            </button>
+                        </div>
+                    ))}
                 </div>
-                <button className="gallery_arrow right">
+                <button className="gallery_arrow right" onClick={scrollRight}>
                     <ArrowBackIosNewIcon sx={{ fontSize: 70, transform: 'rotate(180deg)' }} />
                 </button>
             </div>
@@ -189,6 +199,14 @@ const HomePage = () => {
         </section>
     </main>
     <Footer />
+    <CheckoutModal
+        open={checkoutOpen}
+        onClose={handleCloseCheckout}
+        cartItems={cartItems}
+        removeFromCart={removeFromCart}
+        changeQuantity={changeQuantity}
+        clearCart={clearCart}
+    />
     </div>
   );
 }

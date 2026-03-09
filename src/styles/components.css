@@ -314,20 +314,38 @@
     gap: 40px;
 }
 
+.gallery-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
 .gallery_cards {
     display: flex;
     gap: 60px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    width: 100%;
+}
+
+.gallery::-webkit-scrollbar {
+  display: none;
 }
 
 .gallery_card {
     max-width: 320px;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    flex: 0 0 auto;
 }
 
 .gallery_card img {
-    width: 100%;
+    width: 320px;
+    height: 320px;
     margin-bottom: 25px;
+    object-fit: cover;
 }
 
 .gallery_title {

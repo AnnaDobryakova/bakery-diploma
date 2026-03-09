@@ -15,12 +15,17 @@ import NotFoundPage from "./pages/NotFoundPage";
 import MenuPage from "./pages/MenuPage";
 import AccountPage from "./pages/AccountPage";
 import OrderSuccessPage from "./pages/OrderSuccessPage";
+import ScrollToHash from "./components/ScrollToHash";
 
 export default function App() {
     const [cartItems, setCartItems] = useState(() => {
       const savedCart = localStorage.getItem('cart');
       return savedCart ? JSON.parse(savedCart) : [];
     });
+
+    const clearCart = () => {
+      setCartItems([]);
+    };
 
     useEffect(() => {
       localStorage.setItem('cart', JSON.stringify(cartItems));
@@ -59,14 +64,27 @@ export default function App() {
           };
 
   return (
+    <>
+    <ScrollToHash />
     <Routes>
-      <Route path="/" element={<HomePage />} />
+        <Route
+          path="/"
+          element={
+            <HomePage
+              cartItems={cartItems}
+              removeFromCart={removeFromCart}
+              changeQuantity={changeQuantity}
+              clearCart={clearCart}
+            />
+          }
+        />
       <Route path="/menu" element={
         <MenuPage 
           cartItems={cartItems}
           addToCart={addToCart}
           removeFromCart={removeFromCart}
           changeQuantity={changeQuantity}
+          clearCart={clearCart}
         />
       } />
       <Route
@@ -81,7 +99,7 @@ export default function App() {
         }
       />
       <Route path="/account" element={<AccountPage />} />
-      <Route path="/order/success" element={<OrderSuccessPage />} />
+      <Route path="/order-success" element={<OrderSuccessPage />} />
       <Route path="*" element={<NotFoundPage />} />
 
       <Route path="/admin" element={<AdminLayout />}>
@@ -97,5 +115,6 @@ export default function App() {
         <Route path="reports" element={<AdminReports />} />
       </Route>
     </Routes>
+    </>
   );
 }

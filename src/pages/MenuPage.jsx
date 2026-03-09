@@ -9,12 +9,16 @@ import { mockDataProducts } from "../data/mockData";
 import "../styles/main.css";
 import "../styles/components.css";
 import "../styles/menu_components.css";
+import { IconButton } from "@mui/material";
 
-const MenuPage = ({ cartItems, addToCart, removeFromCart, changeQuantity }) => {
+const MenuPage = ({ cartItems, addToCart, removeFromCart, changeQuantity, clearCart }) => {
+    const products = mockDataProducts;
 
     const [productModalOpen, setProductModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [checkoutOpen, setCheckoutOpen] = useState(false);
+    const [search, setSearch] = useState("");
+    const [category, setCategory] = useState("all");
 
     const handleProductClick = (product) => {
         setSelectedProduct(product);
@@ -34,6 +38,16 @@ const MenuPage = ({ cartItems, addToCart, removeFromCart, changeQuantity }) => {
         setCheckoutOpen(false);
     };
 
+    const filteredProducts = products.filter((product) => {
+        const matchesSearch = product.name
+            .toLowerCase()
+            .includes(search.toLowerCase());
+
+        const matchesCategory =
+            category === "all" || product.category === category;
+
+        return matchesSearch && matchesCategory;
+    });
     
     return (
         <div>
@@ -44,34 +58,70 @@ const MenuPage = ({ cartItems, addToCart, removeFromCart, changeQuantity }) => {
                 <h1>Меню</h1>
                 <div className="menu_right-line">
                     <div className="menu-filters">
-                        <button className="filter active">Все</button>
-                        <button className="filter">Хлеб</button>
-                        <button className="filter">Соленая выпечка</button>
-                        <button className="filter">Сладкая выпечка</button>
-                        <button className="filter">Напитки</button>
+                        <button
+                        className={`filter ${category === "all" ? "active" : ""}`}
+                        onClick={() => setCategory("all")}
+                        >
+                        Все
+                        </button>
+
+                        <button
+                        className={`filter ${category === "bread" ? "active" : ""}`}
+                        onClick={() => setCategory("bread")}
+                        >
+                        Хлеб
+                        </button>
+
+                        <button
+                        className={`filter ${category === "salty" ? "active" : ""}`}
+                        onClick={() => setCategory("salty")}
+                        >
+                        Соленая выпечка
+                        </button>
+
+                        <button
+                        className={`filter ${category === "sweet" ? "active" : ""}`}
+                        onClick={() => setCategory("sweet")}
+                        >
+                        Сладкая выпечка
+                        </button>
+
+                        <button
+                        className={`filter ${category === "drinks" ? "active" : ""}`}
+                        onClick={() => setCategory("drinks")}
+                        >
+                        Напитки
+                        </button>
                     </div>
-                    <button className="filter menu_search">
-                        <p>Найти</p>
-                        <SearchIcon />
-                    </button>
+
+                    <input className="filter menu_search" type="text" placeholder="Найти" value={search} onChange={(e) => setSearch(e.target.value)} />
+                    
                 </div>
                 <div className="container">
-                    <div className="menu-cards" >
-                        { mockDataProducts.map((product)  => (
-                        <ProductCard onClick={() => handleProductClick(product)} key={product.id} product={product} addToCart={addToCart}/>
-                        ))}
+                   <div className="menu-cards">
+                    {filteredProducts.map((product) => (
+                        <ProductCard
+                        key={product.id}
+                        product={product}
+                        onClick={() => handleProductClick(product)}
+                        addToCart={addToCart}
+                        changeQuantity={changeQuantity}
+                        cartItems={cartItems}
+                        />
+                    ))}
                     </div>
                 </div>
             </section>
         </main>
         <Footer />
-        <ProductModal open={productModalOpen} onClose={handleCloseModal} product={selectedProduct} />
+        <ProductModal open={productModalOpen} onClose={handleCloseModal} product={selectedProduct} addToCart={addToCart}/>
         <CheckoutModal
             open={checkoutOpen}
             onClose={handleCloseCheckout}
             cartItems={cartItems}
             removeFromCart={removeFromCart}
             changeQuantity={changeQuantity}
+            clearCart={clearCart}
         />
         </div>
     )

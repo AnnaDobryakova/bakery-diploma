@@ -3,6 +3,7 @@ import ModalWrapper from "../modals/ModalWrapper";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const textFieldStyle = {
   "& .MuiInputLabel-root.Mui-focused": { color: "#FD8719" },
@@ -11,7 +12,6 @@ const textFieldStyle = {
     "&:hover fieldset": { borderColor: "rgba(0,0,0,0.35)" },
     "&.Mui-focused fieldset": { borderColor: "#FD8719" },
 
-    // error рамка
     "&.Mui-error fieldset": { borderColor: "#d32f2f" },
   },
 
@@ -19,13 +19,13 @@ const textFieldStyle = {
   "& .MuiFormHelperText-root.Mui-error": { color: "#d32f2f" },
 };
 
-const normalizeemail = (value) => value.replace(/[^\d+]/g, ""); // убираем пробелы/скобки/дефисы
+// const normalizeemail = (value) => value.replace(/[^\d+]/g, ""); // убираем пробелы/скобки/дефисы
 
 const isValidEmail = (value) => {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 };
 
-const CheckoutModal = ({ open, onClose, cartItems = [], removeFromCart, changeQuantity}) => {
+const CheckoutModal = ({ open, onClose, cartItems = [], removeFromCart, changeQuantity, clearCart}) => {
 
   const total = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -41,6 +41,8 @@ const CheckoutModal = ({ open, onClose, cartItems = [], removeFromCart, changeQu
 
   const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState("");
+
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -59,51 +61,60 @@ const CheckoutModal = ({ open, onClose, cartItems = [], removeFromCart, changeQu
   };
 
   const validate = () => {
-    const newErrors = {};
+  const newErrors = {};
+  setSubmitError("");
 
-    if (!cartItems.length) {
-      setSubmitError("Корзина пуста — добавьте товары, чтобы оформить заказ.");
-      return false;
-    }
+  if (!cartItems.length) {
+    setSubmitError("Корзина пуста — добавьте товары, чтобы оформить заказ.");
+    return false;
+  }
 
-    if (!form.name.trim()) newErrors.name = "Введите имя";
+  if (!form.name.trim()) newErrors.name = "Введите имя";
 
-    if (!form.email.trim()) {
-      newErrors.email = "Введите email";
-    } else if (!isValidEmail(form.email)) {
-      newErrors.email = "Введите корректный email";
-    }
+  if (!form.email.trim()) {
+    newErrors.email = "Введите email";
+  } else if (!isValidEmail(form.email)) {
+    newErrors.email = "Введите корректный email";
+  }
 
-    if (!form.password) {
-      newErrors.password = "Введите пароль";
-    } else if (form.password.length < 6) {
-      newErrors.password = "Минимум 6 символов";
-    }
+  if (!form.password) {
+    newErrors.password = "Введите пароль";
+  } else if (form.password.length < 6) {
+    newErrors.password = "Минимум 6 символов";
+  }
 
-    if (!form.consent) newErrors.consent = "Нужно согласие на обработку данных";
+  if (!form.consent) newErrors.consent = "Нужно согласие на обработку данных";
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
 
-  const handleSubmit = () => {
-    if (!validate()) return;
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const isValid = validate();
+
+    if (!isValid) return;
+
+    clearCart();
+    onClose();
+    navigate("/order-success");
 
     // тут потом будет создание заказа (localStorage / API)
     // сейчас просто закрываем модалку как подтверждение, что форма валидная
-    onClose?.();
+
   };
 
   return (
     <ModalWrapper open={open} onClose={onClose} maxWidth={980} padding={0}>
       <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", minHeight: 520 }}>
         {/* LEFT: корзина */}
-        <Box sx={{ width: "50%", bgcolor: "#F6EFE8", p: 5 }}>
+        <Box sx={{ width: "50%", bgcolor: "#FFF7EF", p: 5 }}>
           <Typography variant="h5" sx={{ mt: 2, fontWeight: 600 }}>
             Корзина
           </Typography>
 
-          <Box sx={{ borderTop: "1px solid rgba(0,0,0,0.4)", pt: 2 }}>
+          <Box sx={{ borderTop: "1px solid rgba(0,0,0,0.4)", pt: 2, maxHeight: 280, overflowY: "auto", pr: 1, }}>
             {cartItems.length === 0 ? (
               <Typography sx={{ opacity: 0.7 }}>Корзина пуста</Typography>
             ) : (
@@ -120,7 +131,7 @@ const CheckoutModal = ({ open, onClose, cartItems = [], removeFromCart, changeQu
                 >
                   <Box
                     component="img"
-                    src={imageURL}
+                    src={item.imageURL}
                     alt={item.name}
                     sx={{ width: 52, height: 52, borderRadius: 2, objectFit: "cover" }}
                   />
@@ -133,14 +144,14 @@ const CheckoutModal = ({ open, onClose, cartItems = [], removeFromCart, changeQu
                     </Typography>
                   </Box>
 
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <Button className="menu_btn" type="button" onClick={() => changeQuantity(item.id, -1)}>
-                      <RemoveIcon sx={{ fontSize: 20 }} />
-                    </Button>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }} className="menu_count">
+                    <button className="menu_btn"  onClick={() => changeQuantity(item.id, -1)}>
+                      <RemoveIcon sx={{ fontSize: 20  }} />
+                    </button>
                     <Typography className="menu_number">{item.quantity}</Typography>
-                    <Button className="menu_btn" type="button" onClick={() => changeQuantity(item.id, 1)}>
+                    <button className="menu_btn" type="button" onClick={() => changeQuantity(item.id, 1)}>
                       <AddIcon sx={{ fontSize: 20 }} />
-                    </Button>
+                    </button>
                   </Box>
                 </Box>
               ))
@@ -165,10 +176,7 @@ const CheckoutModal = ({ open, onClose, cartItems = [], removeFromCart, changeQu
 
           <Box
             component="form"
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleSubmit();
-            }}
+            onSubmit={handleSubmit}
             sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}
           >
             <TextField

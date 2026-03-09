@@ -18,8 +18,8 @@ export default function AdminLayout() {
           <Sidebar isSidebar={isSidebar} />
 
           <Box
-            component="main"
-            className="content"
+            component="admin_main"
+            className="admin_content"
             sx={{
               flexGrow: 1,
               minWidth: 0,      

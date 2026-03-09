@@ -1,89 +1,263 @@
 export const mockDataProducts = [
   {
     id: 1,
-    imageURL: '/img/bun_1.png',
+    imageURL: "/img/cinnamon-roll.jpg",
     name: "Булочка с корицей",
-    description: "Мука, масло, вода, молоко, дрожжи",
-    category: "Выпечка",
+    description: "Мука, масло, сахар, корица, дрожжи",
+    category: "sweet",
     price: 160,
     remainder: 23,
     updateDate: "2023-07-04",
-    weight: 120, 
-    nutrition: {
-      calories: 380,
-      proteins: 6,
-      fats: 18,
-      carbs: 48
-    }
-  },
-  {
+    weight: 120,
+    nutrition: { calories: 380, proteins: 6, fats: 18, carbs: 48 }
+    },
+
+    {
     id: 2,
-    imageURL: '/img/bun_2.png',
-    name: "Хлеб ржаной",
-    description: "Мука, вода, соль, дрожжи",
-    category: "Хлеб",
-    price: 80,
-    remainder: 10,
-    updateDate: "2023-07-03",
-    weight: 500,
-    nutrition: {
-      calories: 210,
-      proteins: 6,
-      fats: 1,
-      carbs: 44
-    }
-  },
-  {
-    id: 3,
-    imageURL: '/img/bun_3.png',
-    name: "Пирожное 'Наполеон'",
-    description: "Мука, масло, вода, молоко, дрожжи",
-    category: "Пирожные",
-    price: 150,
-    remainder: 1,
-    updateDate: "2023-07-05",
-    weight: 150,
-    nutrition: {
-      calories: 420,
-      proteins: 5,
-      fats: 28,
-      carbs: 40
-    }
-  },
-  {
-    id: 4,
-    imageURL: '/img/bun_2.png',
-    name: "Круассан с шоколадом",
-    description: "Мука, масло, вода, молоко, дрожжи",
-    category: "Выпечка",
-    price: 100,
-    remainder: 10,
-    updateDate: "2023-07-02",
+    imageURL: "/img/croissant.jpg",
+    name: "Круассан",
+    description: "Мука, масло, молоко, дрожжи",
+    category: "sweet",
+    price: 180,
+    remainder: 18,
+    updateDate: "2023-07-04",
     weight: 90,
-    nutrition: {
-      calories: 410,
-      proteins: 7,
-      fats: 22,
-      carbs: 45
-    }
-  },
-  {
-    id: 5,
-    imageURL: '/img/bun_1.png',
-    name: "Маффин с черникой",
-    description: "Мука, масло, вода, молоко, дрожжи",
-    category: "Пирожные",
-    price: 130,
-    remainder: 0,
-    updateDate: "2023-07-01",
+    nutrition: { calories: 340, proteins: 7, fats: 20, carbs: 30 }
+    },
+
+    {
+    id: 3,
+    imageURL: "/img/bun_chocolate.png",
+    name: "Булочка с шоколадом",
+    description: "Мука, масло, шоколад, сахар",
+    category: "sweet",
+    price: 170,
+    remainder: 15,
+    updateDate: "2023-07-04",
     weight: 110,
-    nutrition: {
-      calories: 390,
-      proteins: 5,
-      fats: 19,
-      carbs: 52
+    nutrition: { calories: 390, proteins: 6, fats: 19, carbs: 50 }
+    },
+
+    {
+    id: 4,
+    imageURL: "/img/cheesecake.png",
+    name: "Чизкейк",
+    description: "Творожный сыр, сахар, печенье, сливки",
+    category: "sweet",
+    price: 240,
+    remainder: 10,
+    updateDate: "2023-07-04",
+    weight: 150,
+    nutrition: { calories: 420, proteins: 8, fats: 24, carbs: 42 }
+    },
+
+    {
+    id: 5,
+    imageURL: "/img/muffin.jpg",
+    name: "Маффин черничный",
+    description: "Мука, яйца, черника, сахар",
+    category: "sweet",
+    price: 150,
+    remainder: 21,
+    updateDate: "2023-07-04",
+    weight: 100,
+    nutrition: { calories: 360, proteins: 5, fats: 14, carbs: 48 }
+    },
+
+    {
+    id: 6,
+    imageURL: "/img/bread_rye.png",
+    name: "Хлеб ржаной",
+    description: "Ржаная мука, закваска, соль",
+    category: "bread",
+    price: 80,
+    remainder: 30,
+    updateDate: "2023-07-04",
+    weight: 400,
+    nutrition: { calories: 210, proteins: 6, fats: 2, carbs: 42 }
+    },
+
+    {
+    id: 7,
+    imageURL: "/img/bread_white.jpg",
+    name: "Хлеб пшеничный",
+    description: "Пшеничная мука, дрожжи, соль",
+    category: "bread",
+    price: 90,
+    remainder: 25,
+    updateDate: "2023-07-04",
+    weight: 420,
+    nutrition: { calories: 230, proteins: 7, fats: 3, carbs: 45 }
+    },
+
+    {
+    id: 8,
+    imageURL: "/img/baguette.jpg",
+    name: "Багет",
+    description: "Мука, вода, дрожжи, соль",
+    category: "bread",
+    price: 120,
+    remainder: 19,
+    updateDate: "2023-07-04",
+    weight: 350,
+    nutrition: { calories: 250, proteins: 8, fats: 2, carbs: 50 }
+    },
+
+    {
+    id: 9,
+    imageURL: "/img/grain_bread.png",
+    name: "Хлеб зерновой",
+    description: "Цельнозерновая мука, семена льна, соль, вода",
+    category: "bread",
+    price: 130,
+    remainder: 17,
+    updateDate: "2023-07-04",
+    weight: 380,
+    nutrition: { calories: 220, proteins: 8, fats: 4, carbs: 40 }
+    },
+
+    {
+    id: 10,
+    imageURL: "/img/ciabatta.jpg",
+    name: "Чиабатта",
+    description: "Мука, вода, оливковое масло",
+    category: "bread",
+    price: 140,
+    remainder: 14,
+    updateDate: "2023-07-04",
+    weight: 320,
+    nutrition: { calories: 240, proteins: 7, fats: 4, carbs: 44 }
+    },
+
+    {
+    id: 11,
+    imageURL: "/img/pie_meat.png",
+    name: "Пирожок с мясом",
+    description: "Мука, говядина, лук",
+    category: "salty",
+    price: 150,
+    remainder: 20,
+    updateDate: "2023-07-04",
+    weight: 130,
+    nutrition: { calories: 320, proteins: 12, fats: 16, carbs: 28 }
+    },
+
+    {
+    id: 12,
+    imageURL: "/img/pie_cabbage.jpg",
+    name: "Пирожок с капустой",
+    description: "Мука, капуста, масло",
+    category: "salty",
+    price: 130,
+    remainder: 22,
+    updateDate: "2023-07-04",
+    weight: 120,
+    nutrition: { calories: 280, proteins: 7, fats: 10, carbs: 36 }
+    },
+
+    {
+    id: 13,
+    imageURL: "/img/quiche.png",
+    name: "Киш с курицей",
+    description: "Курица, сливки, тесто",
+    category: "salty",
+    price: 210,
+    remainder: 12,
+    updateDate: "2023-07-04",
+    weight: 160,
+    nutrition: { calories: 350, proteins: 15, fats: 20, carbs: 24 }
+    },
+
+    {
+    id: 14,
+    imageURL: "/img/sandwich.png",
+    name: "Сэндвич с ветчиной",
+    description: "Хлеб, ветчина, сыр",
+    category: "salty",
+    price: 190,
+    remainder: 16,
+    updateDate: "2023-07-04",
+    weight: 180,
+    nutrition: { calories: 330, proteins: 14, fats: 17, carbs: 30 }
+    },
+
+    {
+    id: 15,
+    imageURL: "/img/pizza.png",
+    name: "Пицца с колбасой",
+    description: "Тесто, томаты, сыр, колбаса",
+    category: "salty",
+    price: 220,
+    remainder: 9,
+    updateDate: "2023-07-04",
+    weight: 200,
+    nutrition: { calories: 410, proteins: 12, fats: 20, carbs: 46 }
+    },
+
+    {
+    id: 16,
+    imageURL: "/img/coffee.png",
+    name: "Кофе американо",
+    description: "Кофе, вода",
+    category: "drinks",
+    price: 120,
+    remainder: 50,
+    updateDate: "2023-07-04",
+    weight: 250,
+    nutrition: { calories: 5, proteins: 0, fats: 0, carbs: 1 }
+    },
+
+    {
+    id: 17,
+    imageURL: "/img/cappuccino.png",
+    name: "Капучино",
+    description: "Кофе, молоко",
+    category: "drinks",
+    price: 160,
+    remainder: 42,
+    updateDate: "2023-07-04",
+    weight: 250,
+    nutrition: { calories: 80, proteins: 4, fats: 3, carbs: 9 }
+    },
+
+    {
+    id: 18,
+    imageURL: "/img/latte.jpg",
+    name: "Латте",
+    description: "Кофе, молоко",
+    category: "drinks",
+    price: 170,
+    remainder: 38,
+    updateDate: "2023-07-04",
+    weight: 300,
+    nutrition: { calories: 95, proteins: 5, fats: 4, carbs: 10 }
+    },
+
+    {
+    id: 19,
+    imageURL: "/img/tea.png",
+    name: "Чай черный",
+    description: "Чайный лист",
+    category: "drinks",
+    price: 90,
+    remainder: 60,
+    updateDate: "2023-07-04",
+    weight: 250,
+    nutrition: { calories: 2, proteins: 0, fats: 0, carbs: 0 }
+    },
+
+    {
+    id: 20,
+    imageURL: "/img/lemonade.jpg",
+    name: "Лимонад",
+    description: "Лимон, сахар, вода",
+    category: "drinks",
+    price: 140,
+    remainder: 35,
+    updateDate: "2023-07-04",
+    weight: 300,
+    nutrition: { calories: 120, proteins: 0, fats: 0, carbs: 30 }
     }
-  },
 ];
 
 export const mockDataCustomers = [
@@ -133,6 +307,7 @@ export const mockDataCustomers = [
     status: "Активен",
     ordersCount: 1,
   },
+
 ];
 
 export const mockDataEmployees = [

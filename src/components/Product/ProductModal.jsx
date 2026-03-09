@@ -2,7 +2,7 @@ import { Box, Typography, Button } from '@mui/material';
 import { useState, useMemo } from 'react';
 import ModalWrapper from '../../modals/ModalWrapper';
 
-const ProductModal = ({ product, open, onClose }) => {
+const ProductModal = ({  product, open, onClose, addToCart }) => {
     const [active, setActive] = useState('price');
     const [mode, setMode] = useState('per100');
 
@@ -31,8 +31,8 @@ const ProductModal = ({ product, open, onClose }) => {
     if (!product || !nutrients) return null;
     return (
             <ModalWrapper open={open} onClose={onClose} padding={'50px'}>
-                <Box sx={{objectFit: 'none',}}>
-                    <img src={product.imageURL} alt={product.name}/>
+                <Box sx={{objectFit: 'none'}}>
+                    <img src={product.imageURL} alt={product.name} style={{ width: '300px', height: '300px', objectFit: 'cover' }}    />
                 </Box>
 
                 <Box sx={{
@@ -143,16 +143,19 @@ const ProductModal = ({ product, open, onClose }) => {
                             {product.price} ₽
                         </Typography>
                     </Box>
-                    <Button onClick={() => addToCart(product)}
+                    <Button 
+                    onClick={() => {
+                        addToCart(product);
+                        onClose();
+                    }}
                     variant='contained' 
-                            sx={{
-                                backgroundColor: '#FD8719',
-                                borderRadius: '64px',
-                                textTransform: 'initial',
-                                width: '100%',
-                                mt: 2
-                                
-                            }}
+                        sx={{
+                            backgroundColor: '#FD8719',
+                            borderRadius: '64px',
+                            textTransform: 'initial',
+                            width: '100%',
+                            mt: 2
+                        }}
                     >Добавить в корзину
                     </Button>
                 </Box>
