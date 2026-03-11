@@ -16,6 +16,8 @@ import MenuPage from "./pages/MenuPage";
 import AccountPage from "./pages/AccountPage";
 import OrderSuccessPage from "./pages/OrderSuccessPage";
 import ScrollToHash from "./components/ScrollToHash";
+import ProtectedRoute from "./utils/ProtectedRoute";
+import AdminRoute from "./admin/utils/AdminRoute";
 
 export default function App() {
     const [cartItems, setCartItems] = useState(() => {
@@ -98,11 +100,15 @@ export default function App() {
           />
         }
       />
-      <Route path="/account" element={<AccountPage />} />
+      <Route path="/account" element={<ProtectedRoute>
+                                        <AccountPage />
+                                      </ProtectedRoute>} />
       <Route path="/order-success" element={<OrderSuccessPage />} />
       <Route path="*" element={<NotFoundPage />} />
 
-      <Route path="/admin" element={<AdminLayout />}>
+      <Route path="/admin" element={<AdminRoute>
+                                      <AdminLayout />
+                                    </AdminRoute>}>
         <Route index element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="customers" element={<AdminCustomers />} />

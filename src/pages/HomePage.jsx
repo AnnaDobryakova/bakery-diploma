@@ -3,7 +3,6 @@ import Footer from "../components/Footer/Footer";
 import StarIcon from '@mui/icons-material/Star';
 import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import ProductModal from "../components/Product/ProductModal";
 import CheckoutModal from "../modals/CheckoutModal";
 import "../styles/main.css";
 import "../styles/components.css";

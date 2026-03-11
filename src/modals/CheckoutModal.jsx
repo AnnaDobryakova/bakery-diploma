@@ -1,9 +1,19 @@
-import { Box, Typography, Button, TextField, Checkbox, FormControlLabel } from "@mui/material";
+import { Box, Typography, Button, TextField } from "@mui/material";
 import ModalWrapper from "../modals/ModalWrapper";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import AuthModal from "./AuthModal";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import dayjs from "dayjs";
+import "dayjs/locale/ru";
+
+dayjs.locale("ru");
+
 
 const textFieldStyle = {
   "& .MuiInputLabel-root.Mui-focused": { color: "#FD8719" },
@@ -19,12 +29,6 @@ const textFieldStyle = {
   "& .MuiFormHelperText-root.Mui-error": { color: "#d32f2f" },
 };
 
-// const normalizeemail = (value) => value.replace(/[^\d+]/g, ""); // убираем пробелы/скобки/дефисы
-
-const isValidEmail = (value) => {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-};
-
 const CheckoutModal = ({ open, onClose, cartItems = [], removeFromCart, changeQuantity, clearCart}) => {
 
   const total = cartItems.reduce(
@@ -32,84 +36,60 @@ const CheckoutModal = ({ open, onClose, cartItems = [], removeFromCart, changeQu
     0
   );
 
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    password: "",
-    consent: false,
-  });
-
-  const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState("");
-
   const navigate = useNavigate();
+  const [pickupTime, setPickupTime] = useState(null);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+  const { isAuthenticated, user } = useAuth();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
-    setForm((prev) => ({ ...prev, [name]: value }));
-    setErrors((prev) => ({ ...prev, [name]: "" }));
-    setSubmitError("");
-  };
-
-  const handleConsentChange = (e) => {
-    const checked = e.target.checked;
-
-    setForm((prev) => ({ ...prev, consent: checked }));
-    setErrors((prev) => ({ ...prev, consent: "" }));
-    setSubmitError("");
-  };
-
-  const validate = () => {
-  const newErrors = {};
+const handleCheckout = () => {
   setSubmitError("");
 
   if (!cartItems.length) {
     setSubmitError("Корзина пуста — добавьте товары, чтобы оформить заказ.");
-    return false;
+    return;
   }
 
-  if (!form.name.trim()) newErrors.name = "Введите имя";
-
-  if (!form.email.trim()) {
-    newErrors.email = "Введите email";
-  } else if (!isValidEmail(form.email)) {
-    newErrors.email = "Введите корректный email";
+  if (!isAuthenticated) {
+    setIsAuthModalOpen(true);
+    return;
   }
 
-  if (!form.password) {
-    newErrors.password = "Введите пароль";
-  } else if (form.password.length < 6) {
-    newErrors.password = "Минимум 6 символов";
+  if (!pickupTime) {
+    setSubmitError("Выберите дату и время самовывоза.");
+    return;
   }
+  
+  const orderNumber = Math.floor(1000 + Math.random() * 9000);
 
-  if (!form.consent) newErrors.consent = "Нужно согласие на обработку данных";
+  const newOrder = {
+    id: orderNumber,
+    userEmail: user?.email || "",
+    items: cartItems,
+    total,
+    createdAt: new Date().toISOString(),
+    status: "new",
+    pickupTime: pickupTime ? pickupTime.toISOString() : null
+  };
 
-  setErrors(newErrors);
-  return Object.keys(newErrors).length === 0;
+  const existingOrders = JSON.parse(localStorage.getItem("orders")) || [];
+  localStorage.setItem("orders", JSON.stringify([...existingOrders, newOrder]));
+
+  clearCart();
+  onClose();
+
+  navigate("/order-success", {
+    state: { orderNumber },
+  });
 };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
 
-    const isValid = validate();
-
-    if (!isValid) return;
-
-    clearCart();
-    onClose();
-    navigate("/order-success");
-
-    // тут потом будет создание заказа (localStorage / API)
-    // сейчас просто закрываем модалку как подтверждение, что форма валидная
-
-  };
 
   return (
     <ModalWrapper open={open} onClose={onClose} maxWidth={980} padding={0}>
       <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", minHeight: 520 }}>
-        {/* LEFT: корзина */}
-        <Box sx={{ width: "50%", bgcolor: "#FFF7EF", p: 5 }}>
+        <Box sx={{ minWidth: '500px', bgcolor: "#FFF7EF", p: 5 }}>
           <Typography variant="h5" sx={{ mt: 2, fontWeight: 600 }}>
             Корзина
           </Typography>
@@ -158,6 +138,25 @@ const CheckoutModal = ({ open, onClose, cartItems = [], removeFromCart, changeQu
             )}
           </Box>
 
+          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
+            <Box sx={{ mt: 3  }}>
+             
+              <DateTimePicker
+                label="Время самовывоза"
+                value={pickupTime}
+                onChange={(newValue) => setPickupTime(newValue)}
+                format="DD.MM.YYYY HH:mm"
+                renderInput={(params) => <TextField {...params} fullWidth />}
+              />
+            </Box>
+          </LocalizationProvider>
+
+          {submitError && (
+              <Typography sx={{ color: "#d32f2f", fontSize: 13, mt: 1 }}>
+                {submitError}
+              </Typography>
+            )}
+
           <Box sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}>
             <Typography variant="h4" sx={{ mt: 2, fontWeight: 600 }}>
               Итого:
@@ -166,76 +165,13 @@ const CheckoutModal = ({ open, onClose, cartItems = [], removeFromCart, changeQu
               {total} ₽
             </Typography>
           </Box>
-        </Box>
 
-        {/* RIGHT: оформление */}
-        <Box sx={{ width: "50%", p: 5, bgcolor: "#fff" }}>
-          <Typography variant="h5" sx={{ mt: 2, fontWeight: 600 }}>
-            Оформление заказа
-          </Typography>
-
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}
-          >
-            <TextField
-              label="Имя"
-              name="name"
-              variant="outlined"
-              sx={textFieldStyle}
-              fullWidth
-              value={form.name}
-              onChange={handleChange}
-              error={!!errors.name}
-              helperText={errors.name}
-            />
-
-            <TextField
-              label="Email"
-              name="email"
-              variant="outlined"
-              sx={textFieldStyle}
-              fullWidth
-              value={form.email}
-              onChange={handleChange}
-              error={!!errors.email}
-              helperText={errors.email}
-            />
-
-            <TextField
-              label="Пароль"
-              name="password"
-              type="password"
-              variant="outlined"
-              sx={textFieldStyle}
-              fullWidth
-              value={form.password}
-              onChange={handleChange}
-              error={!!errors.password}
-              helperText={errors.password}
-            />
-
-            <FormControlLabel
-              control={<Checkbox checked={form.consent} onChange={handleConsentChange} />}
-              label="Я согласен(на) на обработку персональных данных"
-            />
-            {errors.consent && (
-              <Typography sx={{ color: "#d32f2f", fontSize: 12, mt: -1 }}>
-                {errors.consent}
-              </Typography>
-            )}
-
-            {submitError && (
-              <Typography sx={{ color: "#d32f2f", fontSize: 13 }}>
-                {submitError}
-              </Typography>
-            )}
-
-            <Button
+          <Button
+          
+          onClick={handleCheckout}
               disabled={!cartItems.length}
               variant="contained"
-              type="submit"
+              type="button"
               sx={{
                 backgroundColor: "#FD8719",
                 borderRadius: "64px",
@@ -243,11 +179,18 @@ const CheckoutModal = ({ open, onClose, cartItems = [], removeFromCart, changeQu
                 width: "100%",
                 mt: 1,
               }}
+              
             >
               Оформить заказ
+              
             </Button>
+
+
+            <AuthModal
+              open={isAuthModalOpen}
+              onClose={() => setIsAuthModalOpen(false)}
+            />
           </Box>
-        </Box>
       </Box>
     </ModalWrapper>
   );

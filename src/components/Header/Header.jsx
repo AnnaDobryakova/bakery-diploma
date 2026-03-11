@@ -3,7 +3,11 @@ import logo from "/img/logo.svg";
 import PersonIcon from '@mui/icons-material/Person';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { Link } from "react-router-dom";
-
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import AuthModal from "../../modals/AuthModal";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 
 const Header = ({ onCartClick, cartItems = [] }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -13,12 +17,45 @@ const Header = ({ onCartClick, cartItems = [] }) => {
   // const [openCheckout, setOpenCheckout] = useState(false);
   const totalCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
-  const handleOpenCheckout = () => {
-    setOpenCheckout(true);
-  };
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const { user, isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
 
-  const handleCloseCheckout = () => {
-    setOpenCheckout(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const isProfileMenuOpen = Boolean(anchorEl);
+
+  const handleProfileClick = (event) => {
+  if (!isAuthenticated) {
+    setIsAuthModalOpen(true);
+    return;
+  }
+
+  setAnchorEl(event.currentTarget);
+};
+
+const handleProfileMenuClose = () => {
+  setAnchorEl(null);
+};
+
+const handleAccountClick = () => {
+  handleProfileMenuClose();
+
+  if (user?.role === "admin") {
+    navigate("/admin");
+  } else {
+    navigate("/account");
+  }
+};
+
+const handleLogoutClick = () => {
+  handleProfileMenuClose();
+  logout();
+  navigate("/");
+};
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
   };
 
   return (
@@ -92,19 +129,19 @@ const Header = ({ onCartClick, cartItems = [] }) => {
           <div className={isMenuOpen ? "mobile_menu open" : "mobile_menu"}>
             <ul>
               <li>
-                <a href="/" onClick={handleNavClick}>Главная</a>
+                <Link to="/" onClick={handleNavClick}>Главная</Link>
               </li>
               <li>
-                <a href="#about" onClick={handleNavClick}>О нас</a>
+                <Link to="/#about" onClick={handleNavClick}>О нас</Link>
               </li>
               <li>
-                <a href="/menu" onClick={handleNavClick}>Меню</a>
+                <Link to="/menu" onClick={handleNavClick}>Меню</Link>
               </li>
               <li>
-                <a href="#reviews" onClick={handleNavClick}>Отзывы</a>
+                <Link to="/#reviews" onClick={handleNavClick}>Отзывы</Link>
               </li>
               <li>
-                <a href="#promo" onClick={handleNavClick}>Акции</a>
+                <Link to="/#promo" onClick={handleNavClick}>Акции</Link>
               </li>
             </ul>
           </div>
@@ -121,7 +158,7 @@ const Header = ({ onCartClick, cartItems = [] }) => {
           </nav>
 
           <div className="header_ender">
-            <button className="btn" type="button" aria-label="Профиль">
+            <button className="btn" type="button" aria-label="Профиль" onClick={handleProfileClick}>
               <PersonIcon sx={{ 
                 fontSize: 30, 
                 cursor: 'pointer', 
@@ -131,6 +168,42 @@ const Header = ({ onCartClick, cartItems = [] }) => {
                 }
               }} />
             </button>
+
+            <Menu
+              anchorEl={anchorEl}
+              open={isProfileMenuOpen}
+              onClose={handleProfileMenuClose}
+              disableScrollLock
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "right",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              slotProps={{
+                sx: {
+                  mt: 1,
+                  borderRadius: "16px",
+                  minWidth: 220,
+                  boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+                  padding: "8px",
+                },
+              }}
+            >
+              <MenuItem onClick={handleAccountClick}
+              sx={{
+                borderRadius: "12px",
+                "&:hover": {
+                  backgroundColor: "#FFF4E8",
+                  color: "#FD8719",
+                },
+              }}>
+                {user?.role === "admin" ? "Админ-панель" : "Личный кабинет"}
+              </MenuItem>
+              <MenuItem onClick={handleLogoutClick}>Выйти</MenuItem>
+            </Menu>
 
             <button className="btn" type="button" aria-label="Корзина" onClick={onCartClick}>
               <ShoppingCartIcon sx={{ fontSize: 30, cursor: 'pointer', color: 'white' }} />
@@ -144,7 +217,10 @@ const Header = ({ onCartClick, cartItems = [] }) => {
         </div>
       </div>
     </header>
-    
+    <AuthModal
+      open={isAuthModalOpen}
+      onClose={() => setIsAuthModalOpen(false)}
+    />
     </>
     
   );
