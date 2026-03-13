@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Client {
+  id        Int      @id @default(autoincrement())
+  fullName  String
+  phone     String?
+  email     String   @unique
+  createdAt DateTime @default(now())
+  status    String?  @default("active")
+  orders    Order[]
+}
+
+model Product {
+  id            Int         @id @default(autoincrement())
+  name          String
+  description   String?
+  price         Decimal     @db.Decimal(10, 2)
+  quantity      Int         @default(0)
+  calories      Int?
+  proteins      Decimal?    @db.Decimal(5, 2)
+  fats          Decimal?    @db.Decimal(5, 2)
+  carbohydrates Decimal?    @db.Decimal(5, 2)
+  category      String?
+  imageUrl      String?
+  isAvailable   Boolean     @default(true)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  orderItems    OrderItem[]
+}
+
+model Order {
+  id          Int         @id @default(autoincrement())
+  clientId    Int
+  client      Client      @relation(fields: [clientId], references: [id])
+  createdAt   DateTime    @default(now())
+  pickupTime  DateTime?
+  status      OrderStatus @default(new)
+  totalAmount Decimal     @db.Decimal(10, 2)
+  comment     String?
+  items       OrderItem[]
+}
+
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  orderId   Int
+  productId Int
+  quantity  Int
+  unitPrice Decimal  @db.Decimal(10, 2)
+  lineTotal Decimal  @db.Decimal(10, 2)
+
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id])
+}
+
+enum OrderStatus {
+  new
+  in_progress
+  ready
+  completed
+  cancelled
+}

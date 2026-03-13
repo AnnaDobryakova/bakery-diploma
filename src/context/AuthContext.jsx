@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
       return { success: false, message: "Пользователь с таким email уже существует" };
     }
 
-    const role = email.toLowerCase() === "admin@bakery.ru" ? "admin" : "user";
+    const role = email.toLowerCase() === "admin@bakery.ru" || email.toLowerCase() === "admin@bakery.com" ? "admin" : "user";
 
     const newUser = {
       id: Date.now(),

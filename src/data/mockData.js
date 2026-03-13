@@ -597,55 +597,31 @@ export const mockLineData = [
   },
 ];
 
-export const mockTransactions = [
-  {
-    txId: "01e4dsa",
-    user: "johndoe",
-    date: "2021-09-01",
-    cost: "43.95",
-  },
-  {
-    txId: "0315dsaa",
-    user: "jackdower",
-    date: "2022-04-01",
-    cost: "133.45",
-  },
-  {
-    txId: "01e4dsa",
-    user: "aberdohnny",
-    date: "2021-09-01",
-    cost: "43.95",
-  },
-  {
-    txId: "51034szv",
-    user: "goodmanave",
-    date: "2022-11-05",
-    cost: "200.95",
-  },
-  {
-    txId: "0a123sb",
-    user: "stevebower",
-    date: "2022-11-02",
-    cost: "13.55",
-  },
-  {
-    txId: "01e4dsa",
-    user: "aberdohnny",
-    date: "2021-09-01",
-    cost: "43.95",
-  },
-  {
-    txId: "120s51a",
-    user: "wootzifer",
-    date: "2019-04-15",
-    cost: "24.20",
-  },
-  {
-    txId: "0315dsaa",
-    user: "jackdower",
-    date: "2022-04-01",
-    cost: "133.45",
-  },
-];
 
+export const recentOrders = [
+  {
+    id: "ORD-1024",
+    client: "Анна Смирнова",
+    date: "2026-03-11",
+    total: "1850 ₽"
+  },
+  {
+    id: "ORD-1025",
+    client: "Иван Петров",
+    date: "2026-03-11",
+    total: "940 ₽"
+  },
+  {
+    id: "ORD-1026",
+    client: "Мария Кузнецова",
+    date: "2026-03-12",
+    total: "2210 ₽"
+  },
+  {
+    id: "ORD-1027",
+    client: "Дмитрий Волков",
+    date: "2026-03-12",
+    total: "1630 ₽"
+  }
+];
 

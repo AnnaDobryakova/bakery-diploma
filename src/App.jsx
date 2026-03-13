@@ -100,9 +100,19 @@ export default function App() {
           />
         }
       />
-      <Route path="/account" element={<ProtectedRoute>
-                                        <AccountPage />
-                                      </ProtectedRoute>} />
+      <Route
+        path="/account"
+        element={
+          <ProtectedRoute>
+            <AccountPage
+              cartItems={cartItems}
+              removeFromCart={removeFromCart}
+              changeQuantity={changeQuantity}
+              clearCart={clearCart}
+            />
+          </ProtectedRoute>
+        }
+      />
       <Route path="/order-success" element={<OrderSuccessPage />} />
       <Route path="*" element={<NotFoundPage />} />
 

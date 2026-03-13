@@ -1,12 +1,12 @@
 import { Box, Button, Typography } from "@mui/material"
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Header from "../components/Header/Header"
 import Footer from "../components/Footer/Footer"
 
 const OrderSuccessPage = () => {
-
+    const navigate = useNavigate();
     const location = useLocation();
-    const orderNumber = location.state?.orderNumber || "—";
+    const orderId = location.state?.orderId;
 
     return (
         <>
@@ -23,8 +23,8 @@ const OrderSuccessPage = () => {
             <Box sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '25px'}}>
                 <Typography variant="h1" sx={{fontWeight: 600}}>Спасибо!</Typography>
                 <Typography variant="h4">Ваш заказ успешно оформлен.</Typography>
-                <Typography variant="h6">Заказ № {orderNumber}</Typography>
-                <Button className="button" variant="contained" href="/" sx={{color: 'white', backgroundColor: '#FD8719', borderRadius: '999px', width: '100%', fontSize: '16px'}}>Вернуться на главную страницу</Button>
+                <Typography variant="h6">Заказ № {orderId}</Typography>
+                <Button className="button" variant="contained" onClick={() => navigate("/")} sx={{color: 'white', backgroundColor: '#FD8719', borderRadius: '999px', width: '100%', fontSize: '16px'}}>Вернуться на главную страницу</Button>
             </Box>
         </Box>
         <Footer />

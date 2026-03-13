@@ -11,7 +11,7 @@ import BarChart from "../components/BarChart";
 import PieChart from "../components/PieChart";
 import StatBox from "../components/StatBox";
 import ProgressCircle from "../components/ProgressCircle";
-import { mockTransactions } from "../../data/mockData";
+import { recentOrders } from "../../data/mockData";
 
 const Dashboard = () => {
     const theme = useTheme();
@@ -44,8 +44,8 @@ const Dashboard = () => {
           {/*ROW 1*/}
           <Box gridColumn="span 3" backgroundColor={colors.primary[400]} display="flex" alignItems="center" justifyContent="center">
             <StatBox
-            title="12,361"
-            subtitle="Email Sent"
+            title="58"
+            subtitle="Сегодняшние заказы"
             progress="0.75"
             icon={<EmailIcon sx={{color: colors.greenAccent[600], fontSize: "26px"}} />}
             increase="+14%"
@@ -53,8 +53,8 @@ const Dashboard = () => {
           </Box>
           <Box gridColumn="span 3" backgroundColor={colors.primary[400]} display="flex" alignItems="center" justifyContent="center">
             <StatBox
-            title="431,225"
-            subtitle="Sales Obtained"
+            title="34 250 ₽"
+            subtitle="Выручка за сегодня"
             progress="0.5"
             icon={<PointOfSaleIcon sx={{color: colors.greenAccent[600], fontSize: "26px"}} />}
             increase="+21%"
@@ -62,8 +62,8 @@ const Dashboard = () => {
           </Box>
           <Box gridColumn="span 3" backgroundColor={colors.primary[400]} display="flex" alignItems="center" justifyContent="center">
             <StatBox
-            title="32,441"
-            subtitle="New Users"
+            title="12"
+            subtitle="Новые клиенты"
             progress="0.30"
             icon={<PersonAddIcon sx={{color: colors.greenAccent[600], fontSize: "26px"}} />}
             increase="+5%"
@@ -71,8 +71,8 @@ const Dashboard = () => {
           </Box> 
           <Box gridColumn="span 3" backgroundColor={colors.primary[400]} display="flex" alignItems="center" justifyContent="center">
             <StatBox
-            title="1,324,417"
-            subtitle="Traffic Inbound"
+            title="214"
+            subtitle="Продано товаров"
             progress="0.80"
             icon={<TrafficIcon sx={{color: colors.greenAccent[600], fontSize: "26px"}} />}
             increase="+43%"
@@ -88,7 +88,7 @@ const Dashboard = () => {
             <Box mt="25px" p="0 30px" display="flex" alignItems="center" justifyContent="space-between">
               <Box>
                 <Typography variant="h5" fontWeight="600" sx={{ color: colors.grey[100] }}>
-                  Общее количество продаж
+                  Продажи по дням недели
                 </Typography>
                 <Typography variant="h3" fontWeight="bold" sx={{ color: colors.greenAccent[500] }}>
                   1,324,417
@@ -108,22 +108,22 @@ const Dashboard = () => {
             <Box gridColumn="span 4" gridRow="span 2" backgroundColor={colors.primary[400]} overflow="auto">
               <Box borderBottom={`4px solid ${colors.primary[500]}`} colors={colors.grey[100]} p="15px" display="flex" alignItems="center" justifyContent="space-between">
                 <Typography variant="h5" fontWeight="600" sx={{ color: colors.grey[100] }}>
-                  Транзакции
+                  Заказы
                 </Typography>
               </Box>
-              {mockTransactions.map((transaction, index) => (
-                <Box key={`${transaction.txId}-${index}`} borderBottom={`4px solid ${colors.primary[500]}`} display="flex" alignItems="center" justifyContent="space-between" p="15px">
+              {recentOrders.map((recentOrder, index) => (
+                <Box key={`${recentOrder.id}-${index}`} borderBottom={`4px solid ${colors.primary[500]}`} display="flex" alignItems="center" justifyContent="space-between" p="15px">
                   <Box>
                      <Typography variant="h5" fontWeight="600" sx={{ color: colors.greenAccent[500] }}>
-                      {transaction.txId} 
+                      {recentOrder.id} 
                     </Typography>
                      <Typography sx={{ color: colors.grey[100]}}>
-                      {transaction.user} 
+                      {recentOrder.client} 
                     </Typography>
                   </Box>
-                  <Box color={colors.grey[100]}>{transaction.date}</Box>
+                  <Box color={colors.grey[100]}>{recentOrder.date}</Box>
                   <Box borderColor={colors.greenAccent[500]} p="5px 10px" borderRadius="4px">
-                    ${transaction.cost}
+                    { recentOrder.total}
                   </Box>
                 </Box>
               ))}
@@ -132,22 +132,22 @@ const Dashboard = () => {
               {/*ROW 3*/}
             <Box gridColumn="span 6" gridRow="span 2" backgroundColor={colors.primary[400]} p="30px">
               <Typography variant="h5" fontWeight="600">
-                Campaign
+                Продажи по категориям
               </Typography>
               <Box display="flex" flexDirection="column" alignItems="center" mt="25px">
                 <ProgressCircle size="125"/>
                 <Typography variant="h5" fontWeight="600" color={colors.greenAccent[500]} sx={{ mt: "15px"}} >
-                  $46,789 revenue generated
+                  Выручка составила 46 789 ₽
                 </Typography>
                 <Typography>
-                  Includes extra misc expenditures and costs
+                  Включает дополнительные расходы и издержки
                 </Typography>
               </Box>
             </Box>
             
             <Box gridColumn="span 6" gridRow="span 2" backgroundColor={colors.primary[400]}>
               <Typography variant="h5" fontWeight="600" sx={{p: "30px 30px 0 30px"}}>
-                Sales Quantity
+                Количество продаж
               </Typography>
               <Box height="250px" mt="-20px">
                 <BarChart isDashboard={true}/>

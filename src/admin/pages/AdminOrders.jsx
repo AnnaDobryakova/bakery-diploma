@@ -1,12 +1,23 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 
 import { tokens } from "../../theme";
-import { mockDataOrders } from "../../data/mockData";
 import Header from "../components/Header";
+import {
+  getOrdersFromStorage,
+  updateOrderStatusInStorage,
+} from "../../utils/storage";
 
-const STATUS_ORDER = ["Новый", "Готовится", "Готово", "Отменён"];
+const STATUS_ORDER = ["new", "in_progress", "ready", "completed", "cancelled"];
+
+const STATUS_LABELS = {
+  new: "Новый",
+  in_progress: "Готовится",
+  ready: "Готов к выдаче",
+  completed: "Выдан",
+  cancelled: "Отменён",
+};
 
 const getNextStatus = (current) => {
   const idx = STATUS_ORDER.indexOf(current);
@@ -18,62 +29,141 @@ const AdminOrders = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const [rows, setRows] = useState(mockDataOrders);
+  const [rows, setRows] = useState([]);
 
-  const getStatusBg = (status) => {
-    if (status === "Новый") return colors.grey[600];
-    if (status === "Готовится") return colors.blueAccent[700];
-    if (status === "Готово") return colors.greenAccent[700];
-    return colors.redAccent[700]; 
+  useEffect(() => {
+    const orders = getOrdersFromStorage().sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
+
+    const mappedOrders = orders.map((order) => ({
+      id: order.id,
+      customerName: order.customerName || order.userName || "Не указано",
+      customerPhone: order.customerPhone || "Не указано",
+      customerEmail: order.userEmail || "Не указано",
+      total: order.total || 0,
+      status: order.status || "new",
+      createdAt: order.createdAt,
+      pickupTime: order.pickupTime,
+      items: order.items || [],
+    }));
+
+    setRows(mappedOrders);
+  }, []);
+
+  const handleStatusChange = (id) => {
+    setRows((prev) =>
+      prev.map((row) => {
+        if (String(row.id) !== String(id)) return row;
+
+        const nextStatus = getNextStatus(row.status);
+        updateOrderStatusInStorage(id, nextStatus);
+
+        return {
+          ...row,
+          status: nextStatus,
+        };
+      })
+    );
   };
 
-  const columns = [
-    { field: "id", headerName: "ID", flex: 0.5 },
-    {
-      field: "customer",
-      headerName: "Клиент",
-      flex: 1,
-      cellClassName: "name-column--cell",
-    },
-    { field: "date", headerName: "Дата заказа", flex: 1 },
-    { field: "total", headerName: "Сумма заказа", flex: 1 },
-    {
-      field: "status",
-      headerName: "Статус",
-      flex: 1,
-      renderCell: ({ row }) => {
-        const { id, status } = row;
+  const getStatusBg = (status) => {
+    if (status === "new") return colors.grey[600];
+    if (status === "in_progress") return colors.blueAccent[700];
+    if (status === "ready") return colors.greenAccent[700];
+    if (status === "completed") return colors.greenAccent[600];
+    if (status === "cancelled") return colors.redAccent[700];
+    return colors.grey[700];
+  };
 
-        return (
-          <Box
-            width="60%"
-            m="10px auto"
-            p="5px"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            backgroundColor={getStatusBg(status)}
-            borderRadius="4px"
-            sx={{
-              cursor: "pointer",
-              userSelect: "none",
-              "&:hover": { opacity: 0.9 },
-            }}
-            title="Нажмите, чтобы изменить статус"
-            onClick={() => {
-              setRows((prev) =>
-                prev.map((r) =>
-                  r.id === id ? { ...r, status: getNextStatus(r.status) } : r
-                )
-              );
-            }}
-          >
-            <Typography color={colors.grey[100]}>{status}</Typography>
-          </Box>
-        );
+  const columns = useMemo(
+    () => [
+      {
+        field: "id",
+        headerName: "№ заказа",
+        flex: 0.8,
       },
-    },
-  ];
+      {
+        field: "customerName",
+        headerName: "Клиент",
+        flex: 1.2,
+        cellClassName: "name-column--cell",
+      },
+      {
+        field: "customerPhone",
+        headerName: "Телефон",
+        flex: 1,
+      },
+      {
+        field: "customerEmail",
+        headerName: "Email",
+        flex: 1.2,
+      },
+      {
+        field: "total",
+        headerName: "Сумма",
+        flex: 0.8,
+        renderCell: ({ value }) => `${value} ₽`,
+      },
+      {
+        field: "createdAt",
+        headerName: "Создан",
+        flex: 1.2,
+        renderCell: ({ value }) =>
+          value ? new Date(value).toLocaleString("ru-RU") : "—",
+      },
+      {
+        field: "pickupTime",
+        headerName: "Самовывоз",
+        flex: 1.2,
+        renderCell: ({ value }) =>
+          value ? new Date(value).toLocaleString("ru-RU") : "Не указано",
+      },
+      {
+        field: "items",
+        headerName: "Состав",
+        flex: 1.5,
+        sortable: false,
+        renderCell: ({ value }) => {
+          if (!value?.length) return "—";
+          return value.map((item) => `${item.name} × ${item.quantity}`).join(", ");
+        },
+      },
+      {
+        field: "status",
+        headerName: "Статус",
+        flex: 1,
+        renderCell: ({ row }) => {
+          const { id, status } = row;
+
+          return (
+            <Box
+              width="80%"
+              m="10px auto"
+              p="5px"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              backgroundColor={getStatusBg(status)}
+              borderRadius="4px"
+              sx={{
+                cursor: "pointer",
+                userSelect: "none",
+                "&:hover": { opacity: 0.9 },
+              }}
+              title="Нажмите, чтобы изменить статус"
+              onClick={() => handleStatusChange(id)}
+            >
+              <Typography color={colors.grey[100]}>
+                {STATUS_LABELS[status] || status}
+              </Typography>
+            </Box>
+          );
+        },
+      },
+    ],
+    [colors]
+  );
 
   return (
     <Box m="20px">
@@ -90,12 +180,10 @@ const AdminOrders = () => {
           },
           "& .MuiDataGrid-cell": { borderBottom: "none" },
           "& .name-column--cell": { color: colors.greenAccent[300] },
-
           "& .MuiDataGrid-columnHeaders": { borderBottom: "none" },
           "& .MuiDataGrid-columnHeaderRow": {
             backgroundColor: `${colors.blueAccent[700]} !important`,
           },
-
           "& .MuiDataGrid-virtualScroller": {
             backgroundColor: colors.primary[400],
           },
@@ -106,14 +194,12 @@ const AdminOrders = () => {
           "& .MuiCheckbox-root": {
             color: `${colors.greenAccent[200]} !important`,
           },
-
           "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
             color: `${colors.grey[100]} !important`,
           },
           "& .MuiDataGrid-mainContent": {
-                      backgroundColor: colors.primary[400],
+            backgroundColor: colors.primary[400],
           },
-
           "& .MuiDataGrid-toolbar": {
             justifyContent: "start",
             gap: "10px",

@@ -1,43 +1,50 @@
 import { useAuth } from "../context/AuthContext";
 import Header from "../components/Header/Header";
 import Footer from "../components/Footer/Footer";
-import { Box, Button, Typography } from "@mui/material";
-import { useMemo, useState } from "react";
+import { Box, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
 import ProfileEditModal from "../modals/ProfileEditModal";
 import CheckoutModal from "../modals/CheckoutModal";
-
+import { getOrdersByUserFromStorage } from "../utils/storage";
 
 const statusMap = {
   new: "Новый",
   in_progress: "Готовится",
   ready: "Готов к выдаче",
-  completed: "Завершён",
+  completed: "Выдан",
   cancelled: "Отменён",
 };
 
 const AccountPage = ({ cartItems, removeFromCart, changeQuantity, clearCart }) => {
   const { user } = useAuth();
 
-  const userOrders = useMemo(() => {
-    const allOrders = JSON.parse(localStorage.getItem("orders")) || [];
-    return allOrders.filter((order) => order.userEmail === user?.email);
-  }, [user]);
-
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [userOrders, setUserOrders] = useState([]);
 
   const handleOpenCheckout = () => {
     setCheckoutOpen(true);
-    };
+  };
 
-    const handleCloseCheckout = () => {
+  const handleCloseCheckout = () => {
     setCheckoutOpen(false);
-    };
+  };
 
-    const [checkoutOpen, setCheckoutOpen] = useState(false);
+  useEffect(() => {
+    if (!user?.email) {
+      setUserOrders([]);
+      return;
+    }
+
+    const orders = getOrdersByUserFromStorage(user.email).sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
+    setUserOrders(orders);
+  }, [user, checkoutOpen]);
 
   return (
     <>
-      <Header onCartClick={handleOpenCheckout} cartItems={cartItems}/>
+      <Header onCartClick={handleOpenCheckout} cartItems={cartItems} />
 
       <Box
         sx={{
@@ -46,7 +53,7 @@ const AccountPage = ({ cartItems, removeFromCart, changeQuantity, clearCart }) =
           alignItems: "flex-start",
           gap: "80px",
           px: 6,
-          pt: '150px',
+          pt: "150px",
           pb: 10,
           minHeight: "70vh",
           flexWrap: "wrap",
@@ -54,53 +61,57 @@ const AccountPage = ({ cartItems, removeFromCart, changeQuantity, clearCart }) =
       >
         <Box
           sx={{
-            width: "420px",
+            width: "360px",
             backgroundColor: "#fff",
-            borderRadius: "24px",
+            borderRadius: "28px",
             p: 4,
             boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
           }}
         >
-          <Typography variant="h3" sx={{ fontWeight: 700, mb: 4 }}>
+          <Typography variant="h4" sx={{ fontWeight: 700, mb: 2 }}>
             Личный кабинет
           </Typography>
 
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
-            <Typography sx={{ fontSize: "20px" }}>
-              <strong>Имя:</strong> {user?.name}
-            </Typography>
-            <Typography sx={{ fontSize: "20px" }}>
-              <strong>Email:</strong> {user?.email}
-            </Typography>
-            <Typography sx={{ fontSize: "20px" }}>
-              <strong>Телефон:</strong> {user?.phone}
-            </Typography>
-          </Box>
+          <Typography sx={{ mb: 1 }}>
+            <strong>Имя:</strong> {user?.name || "Не указано"}
+          </Typography>
 
-          <Button
-            variant="contained"
+          <Typography sx={{ mb: 1 }}>
+            <strong>Email:</strong> {user?.email || "Не указано"}
+          </Typography>
+
+          <Typography sx={{ mb: 3 }}>
+            <strong>Телефон:</strong> {user?.phone || "Не указано"}
+          </Typography>
+
+          <Box
             onClick={() => setIsEditModalOpen(true)}
             sx={{
-              mt: 4,
-              color: "white",
-              backgroundColor: "#FD8719",
-              borderRadius: "999px",
-              width: "100%",
-              fontSize: "16px",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              px: 3,
               py: 1.5,
-              textTransform: "none",
+              borderRadius: "64px",
+              backgroundColor: "#FD8719",
+              color: "#fff",
+              fontWeight: 600,
+              cursor: "pointer",
+              "&:hover": {
+                opacity: 0.9,
+              },
             }}
           >
             Редактировать профиль
-          </Button>
+          </Box>
         </Box>
 
         <Box
           sx={{
-            width: "420px",
+            width: "min(760px, 100%)",
           }}
         >
-          <Typography variant="h3" sx={{ fontWeight: 700, mb: 3 }}>
+          <Typography variant="h4" sx={{ fontWeight: 700, mb: 3 }}>
             Мои заказы
           </Typography>
 
@@ -133,7 +144,6 @@ const AccountPage = ({ cartItems, removeFromCart, changeQuantity, clearCart }) =
                     backgroundColor: "#fff",
                     padding: "18px",
                     borderRadius: "20px",
-                    cursor: "pointer",
                     border: "1px solid #ddd",
                     boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
                   }}
@@ -141,24 +151,47 @@ const AccountPage = ({ cartItems, removeFromCart, changeQuantity, clearCart }) =
                   <Typography sx={{ fontWeight: 700, mb: 1 }}>
                     Заказ №{order.id}
                   </Typography>
-                  <Typography>Сумма: {order.total} ₽</Typography>
-                  <Typography>
+
+                  <Typography sx={{ mb: 0.5 }}>
+                    Сумма: {order.total || 0} ₽
+                  </Typography>
+
+                  <Typography sx={{ mb: 0.5 }}>
                     Статус: {statusMap[order.status] || order.status || "Новый"}
                   </Typography>
-                  <Typography>
-                    Дата: {new Date(order.createdAt).toLocaleString("ru-RU")}
-                  </Typography>
-                  <Typography>
-                    Самовывоз: {order.pickupTime 
-                      ? new Date(order.pickupTime).toLocaleString("ru-RU") 
+
+                  <Typography sx={{ mb: 0.5 }}>
+                    Дата создания:{" "}
+                    {order.createdAt
+                      ? new Date(order.createdAt).toLocaleString("ru-RU")
                       : "Не указано"}
                   </Typography>
+
+                  <Typography sx={{ mb: 1 }}>
+                    Самовывоз:{" "}
+                    {order.pickupTime
+                      ? new Date(order.pickupTime).toLocaleString("ru-RU")
+                      : "Не указано"}
+                  </Typography>
+
+                  {!!order.items?.length && (
+                    <Box sx={{ mt: 1 }}>
+                      <Typography sx={{ fontWeight: 600, mb: 0.5 }}>
+                        Состав заказа:
+                      </Typography>
+
+                      {order.items.map((item, index) => (
+                        <Typography key={`${item.id}-${index}`} sx={{ fontSize: 14 }}>
+                          {item.name} × {item.quantity}
+                        </Typography>
+                      ))}
+                    </Box>
+                  )}
                 </Box>
               ))}
             </Box>
           )}
         </Box>
-
       </Box>
 
       <Footer />
@@ -175,7 +208,7 @@ const AccountPage = ({ cartItems, removeFromCart, changeQuantity, clearCart }) =
         removeFromCart={removeFromCart}
         changeQuantity={changeQuantity}
         clearCart={clearCart}
-    />
+      />
     </>
   );
 };
