@@ -5,9 +5,9 @@ import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import Header from "../components/Header";
 import {
-  getOrdersFromStorage,
-  updateOrderStatusInStorage,
-} from "../../utils/storage";
+  getAllOrders,
+  updateOrderStatus,
+} from "../../api/ordersApi";
 
 const STATUS_ORDER = ["new", "in_progress", "ready", "completed", "cancelled"];
 
@@ -32,40 +32,55 @@ const AdminOrders = () => {
   const [rows, setRows] = useState([]);
 
   useEffect(() => {
-    const orders = getOrdersFromStorage().sort(
-      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-    );
+  const loadOrders = async () => {
+    try {
+      const orders = await getAllOrders();
 
-    const mappedOrders = orders.map((order) => ({
-      id: order.id,
-      customerName: order.customerName || order.userName || "Не указано",
-      customerPhone: order.customerPhone || "Не указано",
-      customerEmail: order.userEmail || "Не указано",
-      total: order.total || 0,
-      status: order.status || "new",
-      createdAt: order.createdAt,
-      pickupTime: order.pickupTime,
-      items: order.items || [],
-    }));
+      const mappedOrders = orders.map((order) => ({
+        id: order.id,
+        customerName: order.client?.fullName || "Не указано",
+        customerPhone: order.client?.phone || "Не указано",
+        customerEmail: order.client?.email || "Не указано",
+        total: Number(order.totalAmount || 0),
+        status: order.status || "new",
+        createdAt: order.createdAt,
+        pickupTime: order.pickupTime,
+        items: order.items || [],
+      }));
 
-    setRows(mappedOrders);
-  }, []);
-
-  const handleStatusChange = (id) => {
-    setRows((prev) =>
-      prev.map((row) => {
-        if (String(row.id) !== String(id)) return row;
-
-        const nextStatus = getNextStatus(row.status);
-        updateOrderStatusInStorage(id, nextStatus);
-
-        return {
-          ...row,
-          status: nextStatus,
-        };
-      })
-    );
+      setRows(mappedOrders);
+    } catch (error) {
+      console.error("Ошибка загрузки заказов:", error);
+      setRows([]);
+    }
   };
+
+  loadOrders();
+}, []);
+
+  const handleStatusChange = async (id) => {
+  const row = rows.find((item) => String(item.id) === String(id));
+  if (!row) return;
+
+  const nextStatus = getNextStatus(row.status);
+
+  try {
+    const updatedOrder = await updateOrderStatus(id, nextStatus);
+
+    setRows((prev) =>
+      prev.map((item) =>
+        String(item.id) === String(id)
+          ? {
+              ...item,
+              status: updatedOrder.status,
+            }
+          : item
+      )
+    );
+  } catch (error) {
+    console.error("Ошибка обновления статуса:", error);
+  }
+};
 
   const getStatusBg = (status) => {
     if (status === "new") return colors.grey[600];
@@ -126,7 +141,7 @@ const AdminOrders = () => {
         sortable: false,
         renderCell: ({ value }) => {
           if (!value?.length) return "—";
-          return value.map((item) => `${item.name} × ${item.quantity}`).join(", ");
+          return value.map((item) => `${item.product?.name || "Товар"} × ${item.quantity}`).join(", ");
         },
       },
       {

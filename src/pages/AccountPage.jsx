@@ -5,15 +5,8 @@ import { Box, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import ProfileEditModal from "../modals/ProfileEditModal";
 import CheckoutModal from "../modals/CheckoutModal";
-import { getOrdersByUserFromStorage } from "../utils/storage";
-
-const statusMap = {
-  new: "Новый",
-  in_progress: "Готовится",
-  ready: "Готов к выдаче",
-  completed: "Выдан",
-  cancelled: "Отменён",
-};
+import { getOrdersByEmail } from "../api/ordersApi";
+import { ORDER_STATUS } from "../utils/orderStatus";
 
 const AccountPage = ({ cartItems, removeFromCart, changeQuantity, clearCart }) => {
   const { user } = useAuth();
@@ -31,16 +24,23 @@ const AccountPage = ({ cartItems, removeFromCart, changeQuantity, clearCart }) =
   };
 
   useEffect(() => {
-    if (!user?.email) {
-      setUserOrders([]);
-      return;
-    }
+    const loadOrders = async () => {
+      if (!user?.email) {
+        setUserOrders([]);
+        return;
+      }
 
-    const orders = getOrdersByUserFromStorage(user.email).sort(
-      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-    );
-    setUserOrders(orders);
-  }, [user, checkoutOpen]);
+      try {
+        const orders = await getOrdersByEmail(user.email);
+        setUserOrders(orders);
+      } catch (error) {
+        console.error("Ошибка загрузки заказов:", error);
+        setUserOrders([]);
+      }
+    };
+
+    loadOrders();
+  }, [user]);
 
   return (
     <>
@@ -137,58 +137,77 @@ const AccountPage = ({ cartItems, removeFromCart, changeQuantity, clearCart }) =
                 gap: 2,
               }}
             >
-              {userOrders.map((order) => (
-                <Box
-                  key={order.id}
-                  sx={{
-                    backgroundColor: "#fff",
-                    padding: "18px",
-                    borderRadius: "20px",
-                    border: "1px solid #ddd",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
-                  }}
-                >
-                  <Typography sx={{ fontWeight: 700, mb: 1 }}>
-                    Заказ №{order.id}
-                  </Typography>
+              {userOrders.map((order) => {
+                const statusInfo = ORDER_STATUS[order.status] || {
+                  label: order.status || "Новый",
+                  color: "#000",
+                };
 
-                  <Typography sx={{ mb: 0.5 }}>
-                    Сумма: {order.total || 0} ₽
-                  </Typography>
+                return (
+                  <Box
+                    key={order.id}
+                    sx={{
+                      backgroundColor: "#fff",
+                      padding: "18px",
+                      borderRadius: "20px",
+                      border: "1px solid #ddd",
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
+                    }}
+                  >
+                    <Typography sx={{ fontWeight: 700, mb: 1 }}>
+                      Заказ №{order.id}
+                    </Typography>
 
-                  <Typography sx={{ mb: 0.5 }}>
-                    Статус: {statusMap[order.status] || order.status || "Новый"}
-                  </Typography>
+                    <Typography sx={{ mb: 0.5 }}>
+                      Сумма: {Number(order.totalAmount || 0)} ₽
+                    </Typography>
 
-                  <Typography sx={{ mb: 0.5 }}>
-                    Дата создания:{" "}
-                    {order.createdAt
-                      ? new Date(order.createdAt).toLocaleString("ru-RU")
-                      : "Не указано"}
-                  </Typography>
+                    <Typography
+                      sx={{
+                        mb: 0.5,
+                        color: statusInfo.color,
+                        fontWeight: 600,
+                      }}
+                    >
+                      Статус: {statusInfo.label}
+                    </Typography>
 
-                  <Typography sx={{ mb: 1 }}>
-                    Самовывоз:{" "}
-                    {order.pickupTime
-                      ? new Date(order.pickupTime).toLocaleString("ru-RU")
-                      : "Не указано"}
-                  </Typography>
+                    <Typography sx={{ mb: 0.5 }}>
+                      Дата создания:{" "}
+                      {order.createdAt
+                        ? new Date(order.createdAt).toLocaleString("ru-RU")
+                        : "Не указано"}
+                    </Typography>
 
-                  {!!order.items?.length && (
-                    <Box sx={{ mt: 1 }}>
-                      <Typography sx={{ fontWeight: 600, mb: 0.5 }}>
-                        Состав заказа:
-                      </Typography>
+                    <Typography sx={{ mb: 1 }}>
+                      Самовывоз:{" "}
+                      {order.pickupTime
+                        ? new Date(order.pickupTime).toLocaleString("ru-RU")
+                        : "Не указано"}
+                    </Typography>
 
-                      {order.items.map((item, index) => (
-                        <Typography key={`${item.id}-${index}`} sx={{ fontSize: 14 }}>
-                          {item.name} × {item.quantity}
+                    {!!order.items?.length && (
+                      <Box sx={{ mt: 1 }}>
+                        <Typography sx={{ fontWeight: 600, mb: 0.5 }}>
+                          Состав заказа:
                         </Typography>
-                      ))}
-                    </Box>
-                  )}
-                </Box>
-              ))}
+
+                        {order.items.map((item, index) => (
+                          <Typography key={`${item.id}-${index}`} sx={{ fontSize: 14 }}>
+                            {item.product?.name || "Товар"} × {item.quantity}
+                          </Typography>
+                        ))}
+                      </Box>
+                    )}
+
+                    {!!order.comment && (
+                      <Typography sx={{ mt: 1, fontSize: 14, color: "#555" }}>
+                        Комментарий: {order.comment}
+                      </Typography>
+                    )}
+                  </Box>
+                );
+              })}
             </Box>
           )}
         </Box>
