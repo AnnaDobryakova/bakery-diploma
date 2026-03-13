@@ -34,10 +34,16 @@ export default function App() {
     }, [cartItems]);
 
     const addToCart = (product) => {
+      if (!product || Number(product.remainder) <= 0) return;
+
       setCartItems((prevCart) => {
         const existingItem = prevCart.find((item) => item.id === product.id);
 
         if (existingItem) {
+          if (existingItem.quantity >= product.remainder) {
+            return prevCart;
+          }
+
           return prevCart.map((item) =>
             item.id === product.id
               ? { ...item, quantity: item.quantity + 1 }

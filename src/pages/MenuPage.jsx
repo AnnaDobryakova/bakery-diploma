@@ -1,131 +1,167 @@
 import Header from "../components/Header/Header";
 import Footer from "../components/Footer/Footer";
-import SearchIcon from '@mui/icons-material/Search';
 import ProductCard from "../components/Product/ProductCard";
 import ProductModal from "../components/Product/ProductModal";
 import CheckoutModal from "../modals/CheckoutModal";
-import { useState } from "react";
-import { mockDataProducts } from "../data/mockData";
+import { useEffect, useState } from "react";
+import { getProducts } from "../api/productsApi";
 import "../styles/main.css";
 import "../styles/components.css";
 import "../styles/menu_components.css";
-import { IconButton } from "@mui/material";
 
-const MenuPage = ({ cartItems, addToCart, removeFromCart, changeQuantity, clearCart }) => {
-    const products = mockDataProducts;
+const MenuPage = ({
+  cartItems,
+  addToCart,
+  removeFromCart,
+  changeQuantity,
+  clearCart,
+}) => {
+  const [products, setProducts] = useState([]);
+  const [productModalOpen, setProductModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("all");
+  const [loading, setLoading] = useState(true);
 
-    const [productModalOpen, setProductModalOpen] = useState(false);
-    const [selectedProduct, setSelectedProduct] = useState(null);
-    const [checkoutOpen, setCheckoutOpen] = useState(false);
-    const [search, setSearch] = useState("");
-    const [category, setCategory] = useState("all");
-
-    const handleProductClick = (product) => {
-        setSelectedProduct(product);
-        setProductModalOpen(true);
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        const data = await getProducts();
+        setProducts(data);
+      } catch (error) {
+        console.error("Ошибка загрузки товаров:", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const handleCloseModal = () => {
-        setProductModalOpen(false);
-        setSelectedProduct(null);
-    };
+    loadProducts();
+  }, []);
 
-    const handleOpenCheckout = () => {
-        setCheckoutOpen(true);
-    };
+  const handleProductClick = (product) => {
+    setSelectedProduct(product);
+    setProductModalOpen(true);
+  };
 
-    const handleCloseCheckout = () => {
-        setCheckoutOpen(false);
-    };
+  const handleCloseModal = () => {
+    setProductModalOpen(false);
+    setSelectedProduct(null);
+  };
 
-    const filteredProducts = products.filter((product) => {
-        const matchesSearch = product.name
-            .toLowerCase()
-            .includes(search.toLowerCase());
+  const handleOpenCheckout = () => {
+    setCheckoutOpen(true);
+  };
 
-        const matchesCategory =
-            category === "all" || product.category === category;
+  const handleCloseCheckout = () => {
+    setCheckoutOpen(false);
+  };
 
-        return matchesSearch && matchesCategory;
-    });
-    
-    return (
-        <div>
-        <Header onCartClick={handleOpenCheckout} cartItems={cartItems}/>
-        
-        <main> 
-            <section className="menu">
-                <h1>Меню</h1>
-                <div className="menu_right-line">
-                    <div className="menu-filters">
-                        <button
-                        className={`filter ${category === "all" ? "active" : ""}`}
-                        onClick={() => setCategory("all")}
-                        >
-                        Все
-                        </button>
+  const filteredProducts = products.filter((product) => {
+    const matchesSearch = product.name
+      .toLowerCase()
+      .includes(search.toLowerCase());
 
-                        <button
-                        className={`filter ${category === "bread" ? "active" : ""}`}
-                        onClick={() => setCategory("bread")}
-                        >
-                        Хлеб
-                        </button>
+    const matchesCategory =
+      category === "all" || product.category === category;
 
-                        <button
-                        className={`filter ${category === "salty" ? "active" : ""}`}
-                        onClick={() => setCategory("salty")}
-                        >
-                        Соленая выпечка
-                        </button>
+    return matchesSearch && matchesCategory;
+  });
 
-                        <button
-                        className={`filter ${category === "sweet" ? "active" : ""}`}
-                        onClick={() => setCategory("sweet")}
-                        >
-                        Сладкая выпечка
-                        </button>
+  return (
+    <div>
+      <Header onCartClick={handleOpenCheckout} cartItems={cartItems} />
 
-                        <button
-                        className={`filter ${category === "drinks" ? "active" : ""}`}
-                        onClick={() => setCategory("drinks")}
-                        >
-                        Напитки
-                        </button>
-                    </div>
+      <main>
+        <section className="menu">
+          <h1>Меню</h1>
+          <div className="menu_right-line">
+            <div className="menu-filters">
+              <button
+                className={`filter ${category === "all" ? "active" : ""}`}
+                onClick={() => setCategory("all")}
+              >
+                Все
+              </button>
 
-                    <input className="filter menu_search" type="text" placeholder="Найти" value={search} onChange={(e) => setSearch(e.target.value)} />
-                    
-                </div>
-                <div className="container">
-                   <div className="menu-cards">
-                    {filteredProducts.map((product) => (
-                        <ProductCard
-                        key={product.id}
-                        product={product}
-                        onClick={() => handleProductClick(product)}
-                        addToCart={addToCart}
-                        changeQuantity={changeQuantity}
-                        cartItems={cartItems}
-                        />
-                    ))}
-                    </div>
-                </div>
-            </section>
-        </main>
-        <Footer />
-        <ProductModal open={productModalOpen} onClose={handleCloseModal} product={selectedProduct} addToCart={addToCart}/>
-        <CheckoutModal
-            open={checkoutOpen}
-            onClose={handleCloseCheckout}
-            cartItems={cartItems}
-            removeFromCart={removeFromCart}
-            changeQuantity={changeQuantity}
-            clearCart={clearCart}
-        />
-        </div>
-    )
-}
+              <button
+                className={`filter ${category === "bread" ? "active" : ""}`}
+                onClick={() => setCategory("bread")}
+              >
+                Хлеб
+              </button>
+
+              <button
+                className={`filter ${category === "salty" ? "active" : ""}`}
+                onClick={() => setCategory("salty")}
+              >
+                Соленая выпечка
+              </button>
+
+              <button
+                className={`filter ${category === "sweet" ? "active" : ""}`}
+                onClick={() => setCategory("sweet")}
+              >
+                Сладкая выпечка
+              </button>
+
+              <button
+                className={`filter ${category === "drinks" ? "active" : ""}`}
+                onClick={() => setCategory("drinks")}
+              >
+                Напитки
+              </button>
+            </div>
+
+            <input
+              className="filter menu_search"
+              type="text"
+              placeholder="Найти"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+
+          <div className="container">
+            <div className="menu-cards">
+              {loading ? (
+                <p>Загрузка товаров...</p>
+              ) : (
+                filteredProducts.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    onClick={() => handleProductClick(product)}
+                    addToCart={addToCart}
+                    changeQuantity={changeQuantity}
+                    cartItems={cartItems}
+                  />
+                ))
+              )}
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <Footer />
+
+      <ProductModal
+        open={productModalOpen}
+        onClose={handleCloseModal}
+        product={selectedProduct}
+        addToCart={addToCart}
+      />
+
+      <CheckoutModal
+        open={checkoutOpen}
+        onClose={handleCloseCheckout}
+        cartItems={cartItems}
+        removeFromCart={removeFromCart}
+        changeQuantity={changeQuantity}
+        clearCart={clearCart}
+      />
+    </div>
+  );
+};
 
 export default MenuPage;
-

@@ -1,52 +1,40 @@
 import { PrismaClient } from "@prisma/client";
+import { mockDataProducts } from "../../src/data/mockData.js";
 
 const prisma = new PrismaClient();
 
-const products = [
-  {
-    name: "Круассан",
-    description: "Слоёная выпечка с маслом",
-    price: 150,
-    quantity: 20,
-    calories: 320,
-    proteins: 6.5,
-    fats: 14.2,
-    carbohydrates: 50.0,
-    category: "Сладкая выпечка",
-    imageUrl: "/img/croissant.jpg",
-    isAvailable: true,
-  },
-  {
-    name: "Маффин черничный",
-    description: "Маффин с черникой",
-    price: 210,
-    quantity: 15,
-    calories: 280,
-    proteins: 5.1,
-    fats: 10.3,
-    carbohydrates: 42.8,
-    category: "Десерты",
-    imageUrl: "/img/blueberry-muffin.jpg",
-    isAvailable: true,
-  },
-];
+const products = mockDataProducts.map((item) => ({
+  name: item.name,
+  description: item.description,
+  price: item.price,
+  quantity: item.remainder,
+  calories: item.nutrition?.calories ?? null,
+  proteins: item.nutrition?.proteins ?? null,
+  fats: item.nutrition?.fats ?? null,
+  carbohydrates: item.nutrition?.carbs ?? null,
+  category: item.category,
+  imageUrl: item.imageURL,
+  isAvailable: item.remainder > 0,
+}));
 
 async function main() {
+  await prisma.orderItem.deleteMany();
+  await prisma.order.deleteMany();
   await prisma.product.deleteMany();
 
   await prisma.product.createMany({
     data: products,
   });
 
-  console.log("Товары успешно добавлены");
+  console.log(`Добавлено товаров: ${products.length}`);
 }
 
 main()
   .then(async () => {
     await prisma.$disconnect();
   })
-  .catch(async (e) => {
-    console.error(e);
+  .catch(async (error) => {
+    console.error("Ошибка seed:", error);
     await prisma.$disconnect();
     process.exit(1);
   });

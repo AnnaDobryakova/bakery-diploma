@@ -11,24 +11,11 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import dayjs from "dayjs";
 import "dayjs/locale/ru";
-import { addOrderToStorage } from "../utils/storage";
+import { createOrder } from "../api/ordersApi";
+import { getProducts } from "../api/productsApi";
 
 dayjs.locale("ru");
 
-
-const textFieldStyle = {
-  "& .MuiInputLabel-root.Mui-focused": { color: "#FD8719" },
-
-  "& .MuiOutlinedInput-root": {
-    "&:hover fieldset": { borderColor: "rgba(0,0,0,0.35)" },
-    "&.Mui-focused fieldset": { borderColor: "#FD8719" },
-
-    "&.Mui-error fieldset": { borderColor: "#d32f2f" },
-  },
-
-  "& .MuiInputLabel-root.Mui-error": { color: "#d32f2f" },
-  "& .MuiFormHelperText-root.Mui-error": { color: "#d32f2f" },
-};
 
 const CheckoutModal = ({ open, onClose, cartItems = [], removeFromCart, changeQuantity, clearCart}) => {
 
@@ -42,51 +29,11 @@ const CheckoutModal = ({ open, onClose, cartItems = [], removeFromCart, changeQu
   const navigate = useNavigate();
   const [pickupTime, setPickupTime] = useState(null);
 
-  const { isAuthenticated, user } = useAuth();
+  const { user } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
-// const handleCheckout = () => {
-//   setSubmitError("");
 
-//   if (!cartItems.length) {
-//     setSubmitError("Корзина пуста — добавьте товары, чтобы оформить заказ.");
-//     return;
-//   }
-
-//   if (!isAuthenticated) {
-//     setIsAuthModalOpen(true);
-//     return;
-//   }
-
-//   if (!pickupTime) {
-//     setSubmitError("Выберите дату и время самовывоза.");
-//     return;
-//   }
-  
-//   const orderNumber = Math.floor(1000 + Math.random() * 9000);
-
-//   const newOrder = {
-//     id: orderNumber,
-//     userEmail: user?.email || "",
-//     items: cartItems,
-//     total,
-//     createdAt: new Date().toISOString(),
-//     status: "new",
-//     pickupTime: pickupTime ? pickupTime.toISOString() : null
-//   };
-
-//   const existingOrders = JSON.parse(localStorage.getItem("orders")) || [];
-//   localStorage.setItem("orders", JSON.stringify([...existingOrders, newOrder]));
-
-//   clearCart();
-//   onClose();
-
-//   navigate("/order-success", {
-//     state: { orderNumber },
-//   });
-// };
-
-const handleCheckout = () => {
+const handleCheckout = async () => {
   if (!cartItems.length) {
     setSubmitError("Корзина пуста");
     return;
@@ -97,36 +44,39 @@ const handleCheckout = () => {
     return;
   }
 
-  const order = {
-    userEmail: user?.email || "",
-    userName: user?.name || "",
-    customerName: user?.name || "Гость",
-    customerPhone: user?.phone || "",
-    pickupTime: pickupTime ? new Date(pickupTime).toISOString() : null,
-    items: cartItems.map((item) => ({
-      id: item.id,
-      name: item.name,
-      price: item.price,
-      quantity: item.quantity,
-    })),
-    total,
-    status: "new",
-  };
+  try {
+    const orderData = {
+      client: {
+        fullName: user?.name || "Гость",
+        phone: user?.phone || "",
+        email: user?.email || "",
+      },
+      pickupTime: pickupTime ? new Date(pickupTime).toISOString() : null,
+      items: cartItems.map((item) => ({
+        productId: item.id,
+        quantity: item.quantity,
+      })),
+      comment: "",
+    };
 
-  const savedOrder = addOrderToStorage(order);
+    const savedOrder = await createOrder(orderData);
 
-  if (!savedOrder) {
+    if (!savedOrder) {
+      setSubmitError("Не удалось оформить заказ. Попробуйте снова.");
+      return;
+    }
+
+    clearCart();
+    setSubmitError("");
+    onClose();
+
+    navigate("/order-success", {
+      state: { orderId: savedOrder.id },
+    });
+  } catch (error) {
+    console.error("Ошибка оформления заказа:", error);
     setSubmitError("Не удалось оформить заказ. Попробуйте снова.");
-    return;
   }
-
-  clearCart();
-  setSubmitError("");
-  onClose();
-
-  navigate("/order-success", {
-    state: { orderId: savedOrder.id },
-  });
 };
 
   return (

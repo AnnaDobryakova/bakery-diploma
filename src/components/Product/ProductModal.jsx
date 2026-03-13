@@ -143,20 +143,24 @@ const ProductModal = ({  product, open, onClose, addToCart }) => {
                             {product.price} ₽
                         </Typography>
                     </Box>
-                    <Button 
-                    onClick={() => {
-                        addToCart(product);
-                        onClose();
-                    }}
-                    variant='contained' 
-                        sx={{
-                            backgroundColor: '#FD8719',
-                            borderRadius: '64px',
-                            textTransform: 'initial',
-                            width: '100%',
-                            mt: 2
+                    <Button
+                        onClick={() => {
+                            if (product.remainder > 0) {
+                            addToCart(product);
+                            onClose();
+                            }
                         }}
-                    >Добавить в корзину
+                        disabled={product.remainder <= 0}
+                        variant="contained"
+                        sx={{
+                            backgroundColor: product.remainder <= 0 ? "#BDBDBD" : "#FD8719",
+                            borderRadius: "64px",
+                            textTransform: "initial",
+                            width: "100%",
+                            mt: 2,
+                        }}
+                        >
+                        {product.remainder <= 0 ? "Нет в наличии" : "Добавить в корзину"}
                     </Button>
                 </Box>
             </ModalWrapper>
