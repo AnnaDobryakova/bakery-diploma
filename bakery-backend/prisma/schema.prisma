@@ -66,3 +66,15 @@ enum OrderStatus {
   completed
   cancelled
 }
+
+model Employee {
+  id        Int     @id @default(autoincrement())
+  firstName String
+  lastName  String
+  age       Int
+  phone     String
+  email     String  @unique
+  position  String
+  status    String  @default("Активен")
+  createdAt DateTime @default(now())
+}

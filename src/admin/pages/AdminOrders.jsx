@@ -169,7 +169,7 @@ const AdminOrders = () => {
               title="Нажмите, чтобы изменить статус"
               onClick={() => handleStatusChange(id)}
             >
-              <Typography color={colors.grey[100]}>
+              <Typography sx={{fontSize: '12px'}} color={colors.grey[100]}>
                 {STATUS_LABELS[status] || status}
               </Typography>
             </Box>

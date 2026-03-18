@@ -1,20 +1,47 @@
 import { Box, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
-import { mockDataCustomers } from "../../data/mockData";
 import Header from "../components/Header";
 import { useTheme } from "@mui/material";
+import { useEffect, useState } from "react";
+import { getClients } from "../../api/clientsApi";
 
 const AdminCustomers = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
+
+    const [clients, setClients] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const loadClients = async () => {
+        try {
+            const data = await getClients();
+            setClients(data);
+        } catch (error) {
+            console.error("Ошибка загрузки клиентов:", error);
+        } finally {
+            setLoading(false);
+        }
+        };
+
+        loadClients();
+    }, []);
 
     const columns = [
         { field: "id", headerName: "ID", flex: 0.5 },
         { field: "name", headerName: "Имя", flex: 1, cellClassName: "name-column--cell" },
         { field: "phone", headerName: "Телефон", flex: 1 },
         { field: "email", headerName: "Email", flex: 1 },
-        { field: "registeredAt", headerName: "Дата регистрации", flex: 1 },
+        {
+            field: "registrationDate",
+            headerName: "Дата регистрации",
+            flex: 1,
+            valueFormatter: (params) => {
+                    if (!params) return "—";
+                    return new Date(params).toLocaleDateString("ru-RU");
+                },
+            },
         { field: "status", 
             headerName: "Статус", 
             flex: 1,
@@ -82,8 +109,9 @@ const AdminCustomers = () => {
 
                 <DataGrid 
                   checkboxSelection 
-                  rows={mockDataCustomers} 
+                  rows={clients} 
                   columns={columns} 
+                  loading={loading}
                   showToolbar 
                   slotProps={{
                     toolbar: {

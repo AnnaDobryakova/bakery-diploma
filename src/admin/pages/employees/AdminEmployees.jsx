@@ -1,20 +1,31 @@
 import { Box, Button, Typography, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../../theme";
-import { mockDataEmployees } from "../../../data/mockData";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import AddIcon from '@mui/icons-material/Add';
 import Header from "../../components/Header";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 const AdminEmployees = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
+    const navigate = useNavigate();
+    const [employees, setEmployees] = useState([]);
+
+    useEffect(() => {
+        axios.get("http://localhost:5000/api/employees")
+            .then(res => setEmployees(res.data))
+            .catch(err => console.error(err));
+    }, []);
 
     const columns = [
         { field: "id", headerName: "ID"},
-        { field: "name", headerName: "Имя", flex: 1, cellClassName: "name-column--cell" },
+        { field: "firstName", headerName: "Имя", flex: 1, cellClassName: "name-column--cell" },
+        { field: "lastName", headerName: "Фамилия", flex: 1, cellClassName: "name-column--cell" },
         { field: "age", headerName: "Возраст", type: "number", headerAlign: "left", align: "left" },
         { field: "phone", headerName: "Телефон", flex: 1 },
         { field: "email", headerName: "Email", flex: 1 },
@@ -26,7 +37,7 @@ const AdminEmployees = () => {
             headerAlign: "center",
             renderCell: ({ row: { position } }) => {
                 return (
-                    <Box width="60%" m="10px auto" p="5px" display="flex" alignItems="center" justifyContent="center" 
+                    <Box width="80%" m="10px auto" p="5px" display="flex" alignItems="center" justifyContent="center" 
                     backgroundColor={
                         position === "Администратор"
                         ? colors.greenAccent[700]
@@ -38,7 +49,7 @@ const AdminEmployees = () => {
                         {position === "Менеджер" && <SecurityOutlinedIcon />}
                         {position === "Пекарь" && <LockOpenOutlinedIcon />}
                         {position === "Кассир" && <LockOpenOutlinedIcon />}
-                        <Typography color={colors.grey[100]} sx={{ ml: "5px" }}>
+                        <Typography color={colors.grey[100]} sx={{ ml: "5px", fontSize: "12px" }}>
                             {position}
                         </Typography>
                     </Box>
@@ -111,11 +122,11 @@ const AdminEmployees = () => {
                     variant="contained" 
                     color="secondary" 
                     sx={{ mb: 2 }} 
-                    onClick={() => window.location.href = "/admin/employees/new"}>
+                    onClick={() => navigate("/admin/employees/new")}>
                         <AddIcon sx={{ mr: 1 }} />
                         Добавить сотрудника
                     </Button>
-                    <DataGrid checkboxSelection rows={mockDataEmployees} columns={columns} />
+                    <DataGrid checkboxSelection rows={employees} columns={columns} />
             </Box>
         </Box>
     );
