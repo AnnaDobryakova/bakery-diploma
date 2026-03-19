@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-
+import axios from "axios";
 import { tokens } from "../../theme";
 import Header from "../components/Header";
 import {
@@ -55,8 +55,23 @@ const AdminOrders = () => {
     }
   };
 
+
   loadOrders();
 }, []);
+
+useEffect(() => {
+  const markOrdersAsViewed = async () => {
+    try {
+      await axios.put("http://localhost:5000/api/orders/mark-viewed");
+      console.log("mark-viewed response:", res.data);
+    } catch (error) {
+      console.error("Ошибка при обновлении заказов:", error);
+    }
+  };
+
+  markOrdersAsViewed();
+}, []);
+
 
   const handleStatusChange = async (id) => {
   const row = rows.find((item) => String(item.id) === String(id));

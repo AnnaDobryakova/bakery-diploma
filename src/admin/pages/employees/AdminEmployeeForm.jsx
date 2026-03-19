@@ -3,17 +3,18 @@ import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
-const initialValues = {
-  firstName: "",
-  lastName: "",
-  age: "",
-  phone: "",
-  email: "",
-  position: "",
-};
+// const initialValues = {
+//   firstName: "",
+//   lastName: "",
+//   age: "",
+//   phone: "",
+//   email: "",
+//   position: "",
+// };
 
 const phoneRegExp = /^(\+7|8)[\s-]?\(?\d{3}\)?[\s-]?\d{3}[\s-]?\d{2}[\s-]?\d{2}$/;
 
@@ -38,39 +39,89 @@ const userSchema = yup.object().shape({
 });
 
 const AdminEmployeeForm = () => {
-  const isNonMobile = useMediaQuery("(min-width:600px)");
-  const navigate = useNavigate();
+    const isNonMobile = useMediaQuery("(min-width:600px)");
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const isEditMode = Boolean(id);
+
+    const [initialValues, setInitialValues] = useState({
+    firstName: "",
+    lastName: "",
+    age: "",
+    phone: "",
+    email: "",
+    position: "",
+    });
+
+
+    useEffect(() => {
+    if (!isEditMode) return;
+
+    const fetchEmployee = async () => {
+        try {
+        const res = await axios.get(`http://localhost:5000/api/employees/${id}`);
+        const employee = res.data;
+
+        setInitialValues({
+            firstName: employee.firstName || "",
+            lastName: employee.lastName || "",
+            age: employee.age || "",
+            phone: employee.phone || "",
+            email: employee.email || "",
+            position: employee.position || "",
+        });
+        } catch (error) {
+        console.error("Ошибка при загрузке сотрудника:", error);
+        alert("Не удалось загрузить данные сотрудника");
+        }
+    };
+
+    fetchEmployee();
+    }, [id, isEditMode]);
 
   const handleFormSubmit = async (values, { resetForm, setSubmitting }) => {
-    try {
+  try {
+    const payload = {
+      firstName: values.firstName.trim(),
+      lastName: values.lastName.trim(),
+      age: Number(values.age),
+      phone: values.phone.trim(),
+      email: values.email.trim(),
+      position: values.position,
+    };
+
+    if (isEditMode) {
+      await axios.put(`http://localhost:5000/api/employees/${id}`, payload);
+    } else {
       await axios.post("http://localhost:5000/api/employees", {
-        firstName: values.firstName.trim(),
-        lastName: values.lastName.trim(),
-        age: Number(values.age),
-        phone: values.phone.trim(),
-        email: values.email.trim(),
-        position: values.position,
+        ...payload,
         status: "Активен",
       });
-
       resetForm();
-      navigate("/admin/employees");
-    } catch (error) {
-      console.error("Ошибка при добавлении сотрудника:", error);
-      alert("Не удалось добавить сотрудника");
-    } finally {
-      setSubmitting(false);
     }
-  };
+
+    navigate("/admin/employees");
+  } catch (error) {
+    console.error("Ошибка при сохранении сотрудника:", error);
+    alert(isEditMode ? "Не удалось обновить сотрудника" : "Не удалось добавить сотрудника");
+  } finally {
+    setSubmitting(false);
+  }
+};
 
   return (
     <Box m="20px">
       <Header
-        title="ДОБАВИТЬ СОТРУДНИКА"
-        subtitle="Форма для добавления нового сотрудника"
+        title={isEditMode ? "РЕДАКТИРОВАТЬ СОТРУДНИКА" : "ДОБАВИТЬ СОТРУДНИКА"}
+        subtitle={
+            isEditMode
+            ? "Форма для редактирования данных сотрудника"
+            : "Форма для добавления нового сотрудника"
+        }
       />
 
       <Formik
+        enableReinitialize
         onSubmit={handleFormSubmit}
         initialValues={initialValues}
         validationSchema={userSchema}

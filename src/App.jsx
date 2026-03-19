@@ -18,6 +18,8 @@ import OrderSuccessPage from "./pages/OrderSuccessPage";
 import ScrollToHash from "./components/ScrollToHash";
 import ProtectedRoute from "./utils/ProtectedRoute";
 import AdminRoute from "./admin/utils/AdminRoute";
+import AdminProductForm from "./admin/pages/products/AdminProductForm";
+import AdminCategoryForm from "./admin/pages/categories/AdminCategoryForm";
 
 export default function App() {
     const [cartItems, setCartItems] = useState(() => {
@@ -130,9 +132,14 @@ export default function App() {
         <Route path="customers" element={<AdminCustomers />} />
         <Route path="employees" element={<AdminEmployees />} />
         <Route path="employees/new" element={<AdminEmployeeForm />} />
+        <Route path="employees/edit/:id" element={<AdminEmployeeForm />} />
         <Route path="orders" element={<AdminOrders />} />
         <Route path="products" element={<AdminProducts />} />
+        <Route path="products/new" element={<AdminProductForm />} />
+        <Route path="products/edit/:id" element={<AdminProductForm />} />
         <Route path="categories" element={<AdminCategories />} />
+        <Route path="categories/new" element={<AdminCategoryForm />} />
+        <Route path="categories/edit/:id" element={<AdminCategoryForm />} />
         <Route path="promotions" element={<AdminPromotions />} />
         <Route path="reports" element={<AdminReports />} />
       </Route>

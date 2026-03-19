@@ -51,9 +51,6 @@ const ProductCard = ({
         <div className="menu_description">
           <h4>{product.name}</h4>
           <p>{product.description}</p>
-          <p style={{ marginTop: 8, fontWeight: 600 }}>
-            Остаток: {product.remainder}
-          </p>
         </div>
 
         <div className="menu_price">

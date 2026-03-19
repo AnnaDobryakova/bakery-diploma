@@ -4,7 +4,7 @@ import ProductCard from "../components/Product/ProductCard";
 import ProductModal from "../components/Product/ProductModal";
 import CheckoutModal from "../modals/CheckoutModal";
 import { useEffect, useState } from "react";
-import { getProducts } from "../api/productsApi";
+import { getProductCategories, getProducts } from "../api/productsApi";
 import "../styles/main.css";
 import "../styles/components.css";
 import "../styles/menu_components.css";
@@ -17,6 +17,7 @@ const MenuPage = ({
   clearCart,
 }) => {
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [productModalOpen, setProductModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
@@ -25,18 +26,23 @@ const MenuPage = ({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadProducts = async () => {
+    const loadData = async () => {
       try {
-        const data = await getProducts();
-        setProducts(data);
+        const [productsData, categoriesData] = await Promise.all([
+          getProducts(),
+          getProductCategories(),
+        ]);
+
+        setProducts(productsData);
+        setCategories(categoriesData);
       } catch (error) {
-        console.error("Ошибка загрузки товаров:", error);
+        console.error("Ошибка загрузки данных меню:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    loadProducts();
+    loadData();
   }, []);
 
   const handleProductClick = (product) => {
@@ -84,33 +90,15 @@ const MenuPage = ({
                 Все
               </button>
 
-              <button
-                className={`filter ${category === "bread" ? "active" : ""}`}
-                onClick={() => setCategory("bread")}
-              >
-                Хлеб
-              </button>
-
-              <button
-                className={`filter ${category === "salty" ? "active" : ""}`}
-                onClick={() => setCategory("salty")}
-              >
-                Соленая выпечка
-              </button>
-
-              <button
-                className={`filter ${category === "sweet" ? "active" : ""}`}
-                onClick={() => setCategory("sweet")}
-              >
-                Сладкая выпечка
-              </button>
-
-              <button
-                className={`filter ${category === "drinks" ? "active" : ""}`}
-                onClick={() => setCategory("drinks")}
-              >
-                Напитки
-              </button>
+              {categories.map((cat) => (
+                <button
+                  key={cat.value}
+                  className={`filter ${category === cat.value ? "active" : ""}`}
+                  onClick={() => setCategory(cat.value)}
+                >
+                  {cat.label}
+                </button>
+              ))}
             </div>
 
             <input

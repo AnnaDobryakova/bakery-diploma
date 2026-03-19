@@ -1,10 +1,22 @@
-import { Box, Button, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  Button,
+  Typography,
+  useTheme,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+} from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../../theme";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import AddIcon from '@mui/icons-material/Add';
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import Header from "../../components/Header";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -15,12 +27,44 @@ const AdminEmployees = () => {
     const colors = tokens(theme.palette.mode);
     const navigate = useNavigate();
     const [employees, setEmployees] = useState([]);
+    const [selectedEmployeeIds, setSelectedEmployeeIds] = useState([]);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
     useEffect(() => {
         axios.get("http://localhost:5000/api/employees")
             .then(res => setEmployees(res.data))
             .catch(err => console.error(err));
     }, []);
+
+    const handleEdit = () => {
+        if (selectedEmployeeIds.length !== 1) return;
+        navigate(`/admin/employees/edit/${selectedEmployeeIds[0]}`);
+    };
+
+    const handleOpenDeleteDialog = () => {
+        if (selectedEmployeeIds.length !== 1) return;
+        setDeleteDialogOpen(true);
+    };
+
+    const handleCloseDeleteDialog = () => {
+        setDeleteDialogOpen(false);
+    };
+
+    const handleDelete = async () => {
+        if (selectedEmployeeIds.length !== 1) return;
+
+        const employeeId = selectedEmployeeIds[0];
+
+        try {
+            await axios.delete(`http://localhost:5000/api/employees/${employeeId}`);
+            setEmployees((prev) => prev.filter((employee) => employee.id !== employeeId));
+            setSelectedEmployeeIds([]);
+            setDeleteDialogOpen(false);
+        } catch (error) {
+            console.error("Ошибка при удалении сотрудника:", error);
+            alert("Не удалось удалить сотрудника");
+        }
+    };
 
     const columns = [
         { field: "id", headerName: "ID"},
@@ -89,44 +133,101 @@ const AdminEmployees = () => {
                 m="40px 0 0 0"
                 height="75vh"
                 sx={{
-                    "& .MuiDataGrid-root": { border: "none", 
-                        "--DataGrid-t-header-background-base": colors.blueAccent[700], 
-                        "--DataGrid-t-header-foreground-base": colors.grey[100], 
+                    "& .MuiDataGrid-root": {
+                        border: "none",
+                        "--DataGrid-t-header-background-base": colors.blueAccent[700],
+                        "--DataGrid-t-header-foreground-base": colors.grey[100],
                     },
                     "& .MuiDataGrid-cell": { borderBottom: "none" },
                     "& .name-column--cell": { color: colors.greenAccent[300] },
-
                     "& .MuiDataGrid-columnHeaders": { borderBottom: "none" },
                     "& .MuiDataGrid-columnHeaderRow": {
-                    backgroundColor: `${colors.blueAccent[700]} !important`,
+                        backgroundColor: `${colors.blueAccent[700]} !important`,
                     },
-
-                    "& .MuiDataGrid-virtualScroller": { backgroundColor: colors.primary[400] },
+                    "& .MuiDataGrid-virtualScroller": {
+                        backgroundColor: colors.primary[400],
+                    },
                     "& .MuiDataGrid-footerContainer": {
-                    borderTop: "none",
-                    backgroundColor: colors.blueAccent[700],
+                        borderTop: "none",
+                        backgroundColor: colors.blueAccent[700],
                     },
                     "& .MuiCheckbox-root": {
-                    color: `${colors.greenAccent[200]} !important`,
+                        color: `${colors.greenAccent[200]} !important`,
                     },
-                    "& .MuiButton-root": {
-                        backgroundColor: colors.greenAccent[700],
-                        color: colors.grey[100],
-                        "&:hover": {
-                            backgroundColor: colors.greenAccent[600],
-                        },
+                    "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+                        color: `${colors.grey[100]} !important`,
+                    },
+                    "& .MuiDataGrid-mainContent": {
+                        backgroundColor: colors.primary[400],
+                    },
+                    "& .MuiDataGrid-toolbar": {
+                        justifyContent: "start",
+                        gap: "10px",
                     },
                 }}
                 >
-                    <Button 
-                    variant="contained" 
-                    color="secondary" 
-                    sx={{ mb: 2 }} 
-                    onClick={() => navigate("/admin/employees/new")}>
-                        <AddIcon sx={{ mr: 1 }} />
-                        Добавить сотрудника
-                    </Button>
-                    <DataGrid checkboxSelection rows={employees} columns={columns} />
+                    <Box
+                        display="flex"
+                        flexDirection="row"
+                        marginBottom="20px"
+                        gap="10px"
+                    >
+                        <Button 
+                        variant="contained" 
+                        color="secondary" 
+                        onClick={() => navigate("/admin/employees/new")}>
+                            <AddIcon sx={{ mr: 1 }} />
+                            Добавить сотрудника
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="warning"
+                            disabled={selectedEmployeeIds.length !== 1}
+                            onClick={handleEdit}
+                        >
+                            <EditIcon sx={{ mr: 1 }} />
+                            Редактировать
+                        </Button>
+
+                        <Button
+                            variant="contained"
+                            color="error"
+                            disabled={selectedEmployeeIds.length !== 1}
+                            onClick={handleOpenDeleteDialog}
+                        >
+                            <DeleteIcon sx={{ mr: 1 }} />
+                            Удалить
+                        </Button>
+                    </Box>
+
+                    <DataGrid 
+                        checkboxSelection
+                        showToolbar 
+                        rows={employees} 
+                        columns={columns}
+                        onRowSelectionModelChange={(newSelection) => {
+                            const idsArray =
+                            Array.isArray(newSelection)
+                                ? newSelection
+                                : Array.from(newSelection.ids || []);
+
+                            setSelectedEmployeeIds(idsArray);
+                        }}
+                    />
+                    <Dialog open={deleteDialogOpen} onClose={handleCloseDeleteDialog}>
+                    <DialogTitle>Удаление сотрудника</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText>
+                        Вы действительно хотите удалить выбранного сотрудника?
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCloseDeleteDialog}>Отмена</Button>
+                        <Button onClick={handleDelete} color="error" variant="contained">
+                        Удалить
+                        </Button>
+                    </DialogActions>
+                    </Dialog>
             </Box>
         </Box>
     );
