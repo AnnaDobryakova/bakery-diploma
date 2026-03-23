@@ -20,6 +20,7 @@ import ProtectedRoute from "./utils/ProtectedRoute";
 import AdminRoute from "./admin/utils/AdminRoute";
 import AdminProductForm from "./admin/pages/products/AdminProductForm";
 import AdminCategoryForm from "./admin/pages/categories/AdminCategoryForm";
+import AdminPromotionForm from "./admin/pages/promotions/AdminPromotionForm";
 
 export default function App() {
     const [cartItems, setCartItems] = useState(() => {
@@ -141,6 +142,8 @@ export default function App() {
         <Route path="categories/new" element={<AdminCategoryForm />} />
         <Route path="categories/edit/:id" element={<AdminCategoryForm />} />
         <Route path="promotions" element={<AdminPromotions />} />
+        <Route path="promotions/new" element={<AdminPromotionForm />} />
+        <Route path="promotions/edit/:id" element={<AdminPromotionForm />} />
         <Route path="reports" element={<AdminReports />} />
       </Route>
     </Routes>

@@ -1,5 +1,13 @@
 const API_URL = "http://localhost:5000/api/categories";
 
+const normalizeCategory = (category) => ({
+  id: category.id,
+  value: category.value ?? category.code,
+  label: category.label ?? category.name,
+  description: category.description ?? "",
+  productsCount: category.productsCount ?? 0,
+});
+
 export const getCategories = async () => {
   const response = await fetch(API_URL);
 
@@ -7,7 +15,8 @@ export const getCategories = async () => {
     throw new Error("Не удалось получить категории");
   }
 
-  return response.json();
+  const data = await response.json();
+  return data.map(normalizeCategory);
 };
 
 export const getCategoryById = async (id) => {

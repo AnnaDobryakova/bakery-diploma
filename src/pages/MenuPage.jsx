@@ -4,7 +4,8 @@ import ProductCard from "../components/Product/ProductCard";
 import ProductModal from "../components/Product/ProductModal";
 import CheckoutModal from "../modals/CheckoutModal";
 import { useEffect, useState } from "react";
-import { getProductCategories, getProducts } from "../api/productsApi";
+import { getProducts } from "../api/productsApi";
+import { getCategories } from "../api/categoriesApi";
 import "../styles/main.css";
 import "../styles/components.css";
 import "../styles/menu_components.css";
@@ -30,7 +31,7 @@ const MenuPage = ({
       try {
         const [productsData, categoriesData] = await Promise.all([
           getProducts(),
-          getProductCategories(),
+          getCategories(),
         ]);
 
         setProducts(productsData);

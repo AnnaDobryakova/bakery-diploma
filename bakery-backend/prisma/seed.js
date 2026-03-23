@@ -3,59 +3,73 @@ import { mockDataProducts } from "../../src/data/mockData.js";
 
 const prisma = new PrismaClient();
 
-function makeCode(name) {
-  return name
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, "_")
-    .replace(/[^\wа-яё]/gi, "");
-}
+const categoryDictionary = {
+  bread: "Хлеб",
+  sweet: "Сладкая выпечка",
+  salty: "Солёная выпечка",
+  drinks: "Напитки",
+};
 
 async function main() {
-  await prisma.orderItem.deleteMany();
-  await prisma.order.deleteMany();
-  await prisma.product.deleteMany();
-  await prisma.category.deleteMany();
-
-  const uniqueCategoryNames = [
+  // 1. Создаём или обновляем категории
+  const uniqueCategoryCodes = [
     ...new Set(mockDataProducts.map((item) => item.category).filter(Boolean)),
   ];
 
-  const categoriesData = uniqueCategoryNames.map((name) => ({
-    name,
-    code: makeCode(name),
-    description: null,
-  }));
+  for (const code of uniqueCategoryCodes) {
+    await prisma.category.upsert({
+      where: { code },
+      update: {
+        name: categoryDictionary[code] || code,
+        description: null,
+      },
+      create: {
+        code,
+        name: categoryDictionary[code] || code,
+        description: null,
+      },
+    });
+  }
 
-  await prisma.category.createMany({
-    data: categoriesData,
-    skipDuplicates: true,
-  });
-
+  // 2. Получаем актуальные категории
   const categories = await prisma.category.findMany();
+  const categoryMap = new Map(categories.map((cat) => [cat.code, cat.id]));
 
-  const categoryMap = new Map(categories.map((cat) => [cat.name, cat.id]));
+  // 3. Создаём или обновляем товары
+  for (const item of mockDataProducts) {
+    const categoryId = categoryMap.get(item.category) ?? null;
 
-  const products = mockDataProducts.map((item) => ({
-    name: item.name,
-    description: item.description,
-    price: item.price,
-    quantity: item.remainder ?? 0,
-    calories: item.nutrition?.calories ?? null,
-    proteins: item.nutrition?.proteins ?? null,
-    fats: item.nutrition?.fats ?? null,
-    carbohydrates: item.nutrition?.carbs ?? null,
-    categoryId: categoryMap.get(item.category) ?? null,
-    imageUrl: item.imageURL ?? null,
-    isAvailable: (item.remainder ?? 0) > 0,
-  }));
+    const existingProduct = await prisma.product.findFirst({
+      where: { name: item.name },
+    });
 
-  await prisma.product.createMany({
-    data: products,
-  });
+    const productData = {
+      name: item.name,
+      description: item.description || null,
+      price: item.price,
+      quantity: item.remainder ?? 0,
+      calories: item.nutrition?.calories ?? null,
+      proteins: item.nutrition?.proteins ?? null,
+      fats: item.nutrition?.fats ?? null,
+      carbohydrates: item.nutrition?.carbs ?? null,
+      categoryId,
+      imageUrl: item.imageURL ?? null,
+      isAvailable: (item.remainder ?? 0) > 0,
+    };
 
-  console.log(`Добавлено категорий: ${categoriesData.length}`);
-  console.log(`Добавлено товаров: ${products.length}`);
+    if (existingProduct) {
+      await prisma.product.update({
+        where: { id: existingProduct.id },
+        data: productData,
+      });
+    } else {
+      await prisma.product.create({
+        data: productData,
+      });
+    }
+  }
+
+  console.log("Seed выполнен без удаления заказов");
 }
 
 main()

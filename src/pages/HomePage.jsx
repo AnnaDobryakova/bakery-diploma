@@ -6,8 +6,11 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import CheckoutModal from "../modals/CheckoutModal";
 import "../styles/main.css";
 import "../styles/components.css";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { mockDataProducts } from "../data/mockData";
+import PromotionsSection from "../components/PromotionsSection";
+import { getPromotions } from "../api/promotionsApi";
+
 
 const HomePage = ({ cartItems, removeFromCart, changeQuantity, clearCart }) => {
     const products = mockDataProducts
@@ -19,6 +22,27 @@ const HomePage = ({ cartItems, removeFromCart, changeQuantity, clearCart }) => {
     const [checkoutOpen, setCheckoutOpen] = useState(false);
 
     const sliderRef = useRef(null);
+
+    const [promotions, setPromotions] = useState([]);
+
+  useEffect(() => {
+    const loadPromotions = async () => {
+      try {
+        const data = await getPromotions();
+
+        const activePromotions = data.filter(
+          (item) => item.status === "Активен"
+        );
+
+        setPromotions(activePromotions);
+      } catch (error) {
+        console.error("Ошибка загрузки акций:", error);
+      }
+    };
+
+    loadPromotions();
+  }, []);
+
 
     const scrollLeft = () => {
         sliderRef.current?.scrollBy({ left: -300, behavior: "smooth" });
@@ -119,21 +143,9 @@ const HomePage = ({ cartItems, removeFromCart, changeQuantity, clearCart }) => {
                 </button>
             </div>
         </section>
-        <section className="promo" id="promo">
-            <h2 className="promo_title">Акции</h2>
-            <div className="promo_container">
-                <div className="promo__grid">
-                    <div className="promo__item">
-                        <img src="/img/stocks.png" alt="Акция 20%" />
-                        <p>Каждый день скидка 20% с 19:00 до 21:00</p>
-                    </div>
-                    <div className="promo__item">
-                        <img src="/img/stocks.png" alt="Акция 20%" />
-                        <p>Каждый день скидка 20% с 19:00 до 21:00</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+
+        <PromotionsSection promotions={promotions} id="promo"/>
+
         <section className="reviews" id="reviews">
             <h2 className="review_title">Отзывы наших клиентов</h2>
             <div className="reviews__grid container">

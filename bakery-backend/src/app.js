@@ -6,6 +6,7 @@ import ordersRoutes from "./routes/orders.routes.js";
 import clientsRouter from "./routes/clients.routes.js";
 import employeeRoutes from "./routes/employee.routes.js";
 import categoriesRoutes from "./routes/categories.routes.js";
+import promotionsRoutes from "./routes/promotions.routes.js";
 
 dotenv.config();
 
@@ -25,5 +26,6 @@ app.use("/api/orders", ordersRoutes);
 app.use("/api/clients", clientsRouter);
 app.use("/api/employees", employeeRoutes);
 app.use("/api/categories", categoriesRoutes);
+app.use("/api/promotions", promotionsRoutes);
 
 export default app;

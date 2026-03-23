@@ -143,7 +143,7 @@ const AdminCategoryForm = () => {
                 fullWidth
                 variant="filled"
                 type="text"
-                label="Код категории"
+                label="Код категории (название категории на английском языке)"
                 name="code"
                 value={values.code}
                 onChange={handleChange}

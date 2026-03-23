@@ -17,8 +17,8 @@ export const getAllCategories = async (req, res) => {
 
     const normalized = categories.map((category) => ({
       id: category.id,
-      name: category.name,
-      code: category.code,
+      value: category.code,
+      label: category.name,
       description: category.description,
       productsCount: category._count.products,
     }));
@@ -42,7 +42,12 @@ export const getCategoryById = async (req, res) => {
       return res.status(404).json({ message: "Категория не найдена" });
     }
 
-    res.json(category);
+    res.json({
+      id: category.id,
+      name: category.name,
+      code: category.code,
+      description: category.description,
+    });
   } catch (error) {
     console.error("Ошибка при получении категории:", error);
     res.status(500).json({ message: "Не удалось получить категорию" });
@@ -59,8 +64,10 @@ export const createCategory = async (req, res) => {
       });
     }
 
+    const normalizedCode = code.trim().toLowerCase();
+
     const existingCategory = await prisma.category.findUnique({
-      where: { code: code.trim() },
+      where: { code: normalizedCode },
     });
 
     if (existingCategory) {
@@ -72,12 +79,17 @@ export const createCategory = async (req, res) => {
     const createdCategory = await prisma.category.create({
       data: {
         name: name.trim(),
-        code: code.trim(),
+        code: normalizedCode,
         description: description?.trim() || null,
       },
     });
 
-    res.status(201).json(createdCategory);
+    res.status(201).json({
+      id: createdCategory.id,
+      name: createdCategory.name,
+      code: createdCategory.code,
+      description: createdCategory.description,
+    });
   } catch (error) {
     console.error("Ошибка при создании категории:", error);
     res.status(500).json({ message: "Не удалось создать категорию" });
@@ -89,9 +101,11 @@ export const updateCategory = async (req, res) => {
     const { id } = req.params;
     const { name, code, description } = req.body;
 
+    const normalizedCode = code.trim().toLowerCase();
+
     const existingCategory = await prisma.category.findFirst({
       where: {
-        code: code.trim(),
+        code: normalizedCode,
         NOT: {
           id: Number(id),
         },
@@ -108,12 +122,17 @@ export const updateCategory = async (req, res) => {
       where: { id: Number(id) },
       data: {
         name: name.trim(),
-        code: code.trim(),
+        code: normalizedCode,
         description: description?.trim() || null,
       },
     });
 
-    res.json(updatedCategory);
+    res.json({
+      id: updatedCategory.id,
+      name: updatedCategory.name,
+      code: updatedCategory.code,
+      description: updatedCategory.description,
+    });
   } catch (error) {
     console.error("Ошибка при обновлении категории:", error);
     res.status(500).json({ message: "Не удалось обновить категорию" });

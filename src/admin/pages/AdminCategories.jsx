@@ -32,14 +32,23 @@ const AdminCategories = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const loadCategories = async () => {
-    try {
-      const data = await getCategories();
-      setRows(data);
-    } catch (error) {
-      console.error("Ошибка загрузки категорий:", error);
-      alert("Не удалось загрузить категории");
-    }
-  };
+  try {
+    const data = await getCategories();
+
+    const normalizedRows = data.map((item) => ({
+      id: item.id,
+      name: item.name ?? item.label ?? "—",
+      code: item.code ?? item.value ?? "—",
+      description: item.description ?? "",
+      productsCount: item.productsCount ?? 0,
+    }));
+
+    setRows(normalizedRows);
+  } catch (error) {
+    console.error("Ошибка загрузки категорий:", error);
+    alert(error.message || "Не удалось загрузить категории");
+  }
+};
 
   useEffect(() => {
     loadCategories();
@@ -90,57 +99,113 @@ const AdminCategories = () => {
       : colors.redAccent[700];
   };
 
+  // const columns = [
+  //   { field: "id", headerName: "ID", flex: 0.5 },
+  //   {
+  //     field: "name",
+  //     headerName: "Название категории",
+  //     flex: 1,
+  //     cellClassName: "name-column--cell",
+  //   },
+  //   {
+  //     field: "code",
+  //     headerName: "Код категории",
+  //     flex: 1,
+  //   },
+  //   {
+  //     field: "description",
+  //     headerName: "Описание",
+  //     flex: 1.3,
+  //     renderCell: ({ value }) => value || "—",
+  //   },
+  //   {
+  //     field: "productsCount",
+  //     headerName: "Количество товаров",
+  //     flex: 1,
+  //     align: "center",
+  //     headerAlign: "center",
+  //   },
+  //   {
+  //     field: "status",
+  //     headerName: "Статус",
+  //     flex: 1,
+  //     align: "center",
+  //     headerAlign: "center",
+  //     sortable: false,
+  //     renderCell: ({ row }) => (
+  //       <Box
+  //         width="60%"
+  //         m="10px auto"
+  //         p="5px"
+  //         display="flex"
+  //         alignItems="center"
+  //         justifyContent="center"
+  //         backgroundColor={getStatusBg(row.productsCount)}
+  //         borderRadius="4px"
+  //       >
+  //         <Typography color={colors.grey[100]}>
+  //           {row.productsCount > 0 ? "Активна" : "Пустая"}
+  //         </Typography>
+  //       </Box>
+  //     ),
+  //   },
+  // ];
+
+
   const columns = [
-    { field: "id", headerName: "ID", flex: 0.5 },
-    {
-      field: "name",
-      headerName: "Название категории",
-      flex: 1,
-      cellClassName: "name-column--cell",
-    },
-    {
-      field: "code",
-      headerName: "Код категории",
-      flex: 1,
-    },
-    {
-      field: "description",
-      headerName: "Описание",
-      flex: 1.3,
-      renderCell: ({ value }) => value || "—",
-    },
-    {
-      field: "productsCount",
-      headerName: "Количество товаров",
-      flex: 1,
-      align: "center",
-      headerAlign: "center",
-    },
-    {
-      field: "status",
-      headerName: "Статус",
-      flex: 1,
-      align: "center",
-      headerAlign: "center",
-      sortable: false,
-      renderCell: ({ row }) => (
-        <Box
-          width="60%"
-          m="10px auto"
-          p="5px"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          backgroundColor={getStatusBg(row.productsCount)}
-          borderRadius="4px"
-        >
-          <Typography color={colors.grey[100]}>
-            {row.productsCount > 0 ? "Активна" : "Пустая"}
-          </Typography>
-        </Box>
-      ),
-    },
-  ];
+  { field: "id", headerName: "ID", flex: 0.5 },
+  {
+    field: "name",
+    headerName: "Название категории",
+    flex: 1,
+    cellClassName: "name-column--cell",
+    renderCell: ({ value }) => value || "—",
+  },
+  {
+    field: "code",
+    headerName: "Код категории",
+    flex: 1,
+    renderCell: ({ value }) => value || "—",
+  },
+  {
+    field: "description",
+    headerName: "Описание",
+    flex: 1.3,
+    renderCell: ({ value }) => value || "—",
+  },
+  {
+    field: "productsCount",
+    headerName: "Количество товаров",
+    flex: 1,
+    align: "center",
+    headerAlign: "center",
+  },
+  {
+    field: "status",
+    headerName: "Статус",
+    flex: 1,
+    align: "center",
+    headerAlign: "center",
+    sortable: false,
+    renderCell: ({ row }) => (
+      <Box
+        width="60%"
+        m="10px auto"
+        p="5px"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        backgroundColor={getStatusBg(row.productsCount)}
+        borderRadius="4px"
+      >
+        <Typography color={colors.grey[100]}>
+          {row.productsCount > 0 ? "Активна" : "Пустая"}
+        </Typography>
+      </Box>
+    ),
+  },
+];
+
 
   return (
     <Box m="20px">

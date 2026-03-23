@@ -2,7 +2,7 @@ import { ResponsiveLine } from "@nivo/line";
 import { useTheme } from "@mui/material";
 import { tokens } from "../../theme";
 
-const LineChart = ({ isCustomLineColors = false, isDashboard = false, data = [] }) => {
+const LineChart = ({ data = [] }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -38,12 +38,12 @@ const LineChart = ({ isCustomLineColors = false, isDashboard = false, data = [] 
         },
         tooltip: {
           container: {
-            color: colors.primary[500],
+            color: "#000000",
           },
         },
       }}
-      colors={isDashboard ? { datum: "color" } : { scheme: "nivo" }}
-      margin={{ top: 50, right: 50, bottom: 50, left: 60 }}
+      colors={{ datum: "color" }}
+      margin={{ top: 50, right: 110, bottom: 70, left: 60 }}
       xScale={{ type: "point" }}
       yScale={{
         type: "linear",
@@ -52,7 +52,7 @@ const LineChart = ({ isCustomLineColors = false, isDashboard = false, data = [] 
         stacked: false,
         reverse: false,
       }}
-      yFormat=" >-.0f"
+      yFormat=" >-.2f"
       curve="catmullRom"
       axisTop={null}
       axisRight={null}
@@ -60,59 +60,43 @@ const LineChart = ({ isCustomLineColors = false, isDashboard = false, data = [] 
         orient: "bottom",
         tickSize: 5,
         tickPadding: 5,
-        tickRotation: -25,
-        legend: isDashboard ? undefined : "Дата",
-        legendOffset: 36,
+        tickRotation: 0,
+        legend: "Дата",
+        legendOffset: 40,
         legendPosition: "middle",
       }}
       axisLeft={{
         orient: "left",
-        tickValues: 5,
-        tickSize: 3,
+        tickSize: 5,
         tickPadding: 5,
         tickRotation: 0,
-        legend: isDashboard ? undefined : "Количество заказов",
-        legendOffset: -40,
+        legend: "Значение",
+        legendOffset: -50,
         legendPosition: "middle",
       }}
       enableGridX={false}
-      enableGridY={!isDashboard}
       pointSize={10}
       pointColor={{ theme: "background" }}
       pointBorderWidth={2}
       pointBorderColor={{ from: "serieColor" }}
       pointLabelYOffset={-12}
       useMesh={true}
-      legends={
-        isDashboard
-          ? []
-          : [
-              {
-                anchor: "bottom-right",
-                direction: "column",
-                justify: false,
-                translateX: 100,
-                translateY: 0,
-                itemsSpacing: 0,
-                itemDirection: "left-to-right",
-                itemWidth: 80,
-                itemHeight: 20,
-                itemOpacity: 0.75,
-                symbolSize: 12,
-                symbolShape: "circle",
-                symbolBorderColor: "rgba(0, 0, 0, .5)",
-                effects: [
-                  {
-                    on: "hover",
-                    style: {
-                      itemBackground: "rgba(0, 0, 0, .03)",
-                      itemOpacity: 1,
-                    },
-                  },
-                ],
-              },
-            ]
-      }
+      legends={[
+        {
+          anchor: "bottom-right",
+          direction: "column",
+          justify: false,
+          translateX: 100,
+          translateY: 0,
+          itemsSpacing: 10,
+          itemDirection: "left-to-right",
+          itemWidth: 80,
+          itemHeight: 20,
+          itemOpacity: 0.75,
+          symbolSize: 12,
+          symbolShape: "circle",
+        },
+      ]}
     />
   );
 };

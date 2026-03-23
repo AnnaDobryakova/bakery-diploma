@@ -6,6 +6,7 @@ const normalizeProduct = (product) => ({
   name: product.name,
   description: product.description || "",
   category: product.category || "other",
+  categoryName: product.categoryName || product.category || "Без категории",
   price: Number(product.price),
   remainder: product.quantity,
   updateDate: product.updatedAt,

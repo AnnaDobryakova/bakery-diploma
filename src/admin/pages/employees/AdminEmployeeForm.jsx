@@ -7,14 +7,6 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
-// const initialValues = {
-//   firstName: "",
-//   lastName: "",
-//   age: "",
-//   phone: "",
-//   email: "",
-//   position: "",
-// };
 
 const phoneRegExp = /^(\+7|8)[\s-]?\(?\d{3}\)?[\s-]?\d{3}[\s-]?\d{2}[\s-]?\d{2}$/;
 
