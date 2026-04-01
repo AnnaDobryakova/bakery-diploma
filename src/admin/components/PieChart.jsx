@@ -14,6 +14,7 @@ const PieChart = ({ data = [] }) => {
       padAngle={0.7}
       cornerRadius={3}
       activeOuterRadiusOffset={8}
+      valueFormat={(value) => `${value} ₽`}
       colors={[
         "#d2b89b",
         "#d37a63",
@@ -46,14 +47,15 @@ const PieChart = ({ data = [] }) => {
           anchor: "bottom",
           direction: "row",
           justify: false,
-          translateY: 56,
+          translateX: 0,
+          translateY: 80,
           itemsSpacing: 20,
           itemWidth: 100,
-          itemHeight: 18,
+          itemHeight: 60,
           itemTextColor: colors.grey[100],
           itemDirection: "left-to-right",
           itemOpacity: 1,
-          symbolSize: 18,
+          symbolSize: 16,
           symbolShape: "circle",
         },
       ]}

@@ -15,6 +15,7 @@ const initialValues = {
   title: "",
   type: "Скидка",
   value: "",
+  promoCode: "",
   startDate: "",
   endDate: "",
   status: "Активен",
@@ -64,6 +65,7 @@ const AdminPromotionForm = () => {
           title: promotion.title || "",
           type: promotion.type || "Скидка",
           value: promotion.value || "",
+          promoCode: promotion.promoCode || "",
           startDate: promotion.startDate
             ? promotion.startDate.slice(0, 10)
             : "",
@@ -108,6 +110,7 @@ const AdminPromotionForm = () => {
         title: values.title.trim(),
         type: values.type.trim(),
         value: values.value.trim(),
+        promoCode: values.promoCode.trim(),
         startDate: values.startDate,
         endDate: values.endDate,
         status: values.status.trim(),
@@ -215,7 +218,20 @@ const AdminPromotionForm = () => {
                 onBlur={handleBlur}
                 error={!!touched.value && !!errors.value}
                 helperText={touched.value && errors.value}
+                sx={{ gridColumn: "span 1" }}
+              />
+
+              <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label="Промокод (необязательно)"
+                name="promoCode"
+                value={values.promoCode}
+                onChange={handleChange}
+                onBlur={handleBlur}
                 sx={{ gridColumn: "span 2" }}
+                helperText="Если поле заполнено — акция применяется по промокоду. Если пусто — акция автоматическая."
               />
 
               <TextField
@@ -229,7 +245,7 @@ const AdminPromotionForm = () => {
                 onBlur={handleBlur}
                 error={!!touched.status && !!errors.status}
                 helperText={touched.status && errors.status}
-                sx={{ gridColumn: "span 2" }}
+                sx={{ gridColumn: "span 1" }}
               >
                 <MenuItem value="Активен">Активен</MenuItem>
                 <MenuItem value="Неактивен">Неактивен</MenuItem>

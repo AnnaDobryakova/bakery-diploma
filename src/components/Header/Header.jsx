@@ -138,10 +138,10 @@ const handleLogoutClick = () => {
                 <Link to="/menu" onClick={handleNavClick}>Меню</Link>
               </li>
               <li>
-                <Link to="/#reviews" onClick={handleNavClick}>Отзывы</Link>
+                <Link to="/#promo" onClick={handleNavClick}>Акции</Link>
               </li>
               <li>
-                <Link to="/#promo" onClick={handleNavClick}>Акции</Link>
+                <Link to="/#reviews" onClick={handleNavClick}>Отзывы</Link>
               </li>
             </ul>
           </div>

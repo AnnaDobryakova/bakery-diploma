@@ -162,6 +162,36 @@ const AccountPage = ({ cartItems, removeFromCart, changeQuantity, clearCart }) =
                       Сумма: {Number(order.totalAmount || 0)} ₽
                     </Typography>
 
+                    {Number(order.discountAmount || 0) > 0 && (
+                      <>
+                        <Typography sx={{ mb: 0.5 }}>
+                          Сумма до скидки: {Number(order.subtotalAmount || 0)} ₽
+                        </Typography>
+
+                        <Typography sx={{ mb: 0.5 }}>
+                          Скидка: {Number(order.discountAmount || 0)} ₽
+                        </Typography>
+                      </>
+                    )}
+
+                  {order.promotionTitle && (
+                    <Typography sx={{ mb: 0.5 }}>
+                      <strong>Акция:</strong> {order.promotionTitle}
+                    </Typography>
+                  )}
+
+                  {order.promoCode && (
+                    <Typography sx={{ mb: 0.5 }}>
+                      <strong>Промокод:</strong> {order.promoCode}
+                    </Typography>
+                  )}
+
+                  {order.giftLabel && (
+                    <Typography sx={{ mb: 0.5, color: "#2e7d32", fontWeight: 600 }}>
+                      Подарок: {order.giftLabel}
+                    </Typography>
+                  )}
+
                     <Typography
                       sx={{
                         mb: 0.5,

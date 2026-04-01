@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useAdminSearch } from "../../../context/AdminSearchContext";
 
 const AdminPromotions = () => {
   const theme = useTheme();
@@ -27,6 +28,8 @@ const AdminPromotions = () => {
   const [rows, setRows] = useState([]);
   const [selectedPromotionIds, setSelectedPromotionIds] = useState([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  const { search } = useAdminSearch();
 
   const loadPromotions = async () => {
     try {
@@ -147,6 +150,20 @@ const AdminPromotions = () => {
     },
   ];
 
+  const filteredRows = rows.filter((row) => {
+   const q = search.toLowerCase().trim();
+    if (!q) return true;
+
+    return (
+      String(row.id || '').toLowerCase().includes(q) ||
+      String(row.title || '').toLowerCase().includes(q) ||
+      String(row.type || '').toLowerCase().includes(q) ||
+      String(row.status || '').toLowerCase().includes(q) ||
+      String(row.promoCode || '').toLowerCase().includes(q)
+    );   
+  }
+  );
+
   return (
     <Box m="20px">
       <Header
@@ -228,7 +245,7 @@ const AdminPromotions = () => {
         }}
       >
         <DataGrid
-          rows={rows}
+          rows={filteredRows}
           columns={columns}
           checkboxSelection
           disableRowSelectionOnClick

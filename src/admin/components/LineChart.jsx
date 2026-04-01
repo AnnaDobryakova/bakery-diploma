@@ -1,6 +1,7 @@
 import { ResponsiveLine } from "@nivo/line";
 import { useTheme } from "@mui/material";
 import { tokens } from "../../theme";
+import { Box, Typography, } from "@mui/material";
 
 const LineChart = ({ data = [] }) => {
   const theme = useTheme();
@@ -36,11 +37,18 @@ const LineChart = ({ data = [] }) => {
             fill: colors.grey[100],
           },
         },
+        grid: {
+          line: {
+            stroke: "rgba(255,255,255,0.12)",
+            strokeWidth: 1,
+          },
+        },
         tooltip: {
           container: {
             color: "#000000",
           },
         },
+        
       }}
       colors={{ datum: "color" }}
       margin={{ top: 50, right: 110, bottom: 70, left: 60 }}
@@ -61,7 +69,7 @@ const LineChart = ({ data = [] }) => {
         tickSize: 5,
         tickPadding: 5,
         tickRotation: 0,
-        legend: "Дата",
+        legend: "День недели",
         legendOffset: 40,
         legendPosition: "middle",
       }}
@@ -70,7 +78,7 @@ const LineChart = ({ data = [] }) => {
         tickSize: 5,
         tickPadding: 5,
         tickRotation: 0,
-        legend: "Значение",
+        legend: "Показатель",
         legendOffset: -50,
         legendPosition: "middle",
       }}
@@ -81,6 +89,28 @@ const LineChart = ({ data = [] }) => {
       pointBorderColor={{ from: "serieColor" }}
       pointLabelYOffset={-12}
       useMesh={true}
+      tooltip={({ point }) => (
+        <Box
+          sx={{
+            background: "#f7f4ee",
+            color: "#1f2a40",
+            padding: "10px 12px",
+            borderRadius: "8px",
+            boxShadow: "0 2px 10px rgba(0,0,0,0.15)",
+            border: "1px solid rgba(0,0,0,0.08)",
+          }}
+        >
+          <Typography sx={{ fontWeight: 700, fontSize: "13px", mb: "4px" }}>
+            {point.serieId}
+          </Typography>
+          <Typography sx={{ fontSize: "12px" }}>
+            День: {point.data.xFormatted}
+          </Typography>
+          <Typography sx={{ fontSize: "12px" }}>
+            Значение: {point.data.yFormatted}
+          </Typography>
+        </Box>
+      )}
       legends={[
         {
           anchor: "bottom-right",

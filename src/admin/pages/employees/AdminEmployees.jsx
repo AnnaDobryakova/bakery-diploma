@@ -21,6 +21,7 @@ import Header from "../../components/Header";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useAdminSearch } from "../../../context/AdminSearchContext";
 
 const AdminEmployees = () => {
     const theme = useTheme();
@@ -29,6 +30,8 @@ const AdminEmployees = () => {
     const [employees, setEmployees] = useState([]);
     const [selectedEmployeeIds, setSelectedEmployeeIds] = useState([]);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+    const { search } = useAdminSearch();
 
     useEffect(() => {
         axios.get("http://localhost:5000/api/employees")
@@ -126,6 +129,8 @@ const AdminEmployees = () => {
         },
     ];
 
+    const filteredEmployees = employees.filter((employee) => employee.firstName.toLowerCase().includes(search.toLowerCase()) || employee.lastName.toLowerCase().includes(search.toLowerCase()));
+
     return (
         <Box m="20px">
             <Header title="СОТРУДНИКИ" subtitle="Управление сотрудниками и их данными" />
@@ -203,7 +208,7 @@ const AdminEmployees = () => {
                     <DataGrid 
                         checkboxSelection
                         showToolbar 
-                        rows={employees} 
+                        rows={filteredEmployees} 
                         columns={columns}
                         onRowSelectionModelChange={(newSelection) => {
                             const idsArray =

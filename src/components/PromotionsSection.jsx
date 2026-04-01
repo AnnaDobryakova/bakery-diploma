@@ -66,6 +66,19 @@ const PromotionsSection = ({ promotions = [] }) => {
             >
               {promotion.restrictions || "Без дополнительных ограничений"}
             </Typography>
+            {promotion.promoCode && (
+              <Typography
+                sx={{
+                  mt: 1,
+                  fontSize: "1rem",
+                  fontWeight: 700,
+                  color: "#FD8719",
+                  lineHeight: 1.4,
+                }}
+              >
+                Промокод: {promotion.promoCode}
+              </Typography>
+            )}
           </Box>
         ))}
       </Box>

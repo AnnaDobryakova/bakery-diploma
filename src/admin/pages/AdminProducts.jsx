@@ -22,6 +22,7 @@ import { useNavigate } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useAdminSearch } from "../../context/AdminSearchContext";
 
 const AdminProducts = () => {
   const theme = useTheme();
@@ -31,6 +32,8 @@ const AdminProducts = () => {
   const [rows, setRows] = useState([]);
   const [selectedProductIds, setSelectedProductIds] = useState([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  const { search } = useAdminSearch(); 
 
   const loadProducts = async () => {
     try {
@@ -199,6 +202,20 @@ const AdminProducts = () => {
     }
   };
 
+  const filteredRows = rows.filter((row) => {
+   const q = search.toLowerCase().trim();
+    if (!q) return true;
+
+    return (
+      String(row.id || '').toLowerCase().includes(q) ||
+      String(row.name || '').toLowerCase().includes(q) ||
+      String(row.category || '').toLowerCase().includes(q) ||
+      String(row.price || '').toLowerCase().includes(q) ||
+      String(row.stock || '').toLowerCase().includes(q)
+    );   
+  }
+  );
+
   return (
     <Box m="20px">
       <Header title="ТОВАРЫ" subtitle="Управление товарами и их данными" />
@@ -282,7 +299,7 @@ const AdminProducts = () => {
         }}
       >
         <DataGrid
-          rows={rows}
+          rows={filteredRows}
           columns={columns}
           checkboxSelection
           disableRowSelectionOnClick

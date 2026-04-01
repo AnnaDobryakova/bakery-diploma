@@ -114,7 +114,7 @@ const Sidebar = () => {
                   ТОНЭ
                 </Typography>
                 <Typography variant="h5" color={colors.greenAccent[500]}>
-                  Admin
+                  Админ
                 </Typography>
               </Box>
             </Box>

@@ -5,6 +5,7 @@ import Header from "../components/Header";
 import { useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 import { getClients } from "../../api/clientsApi";
+import { useAdminSearch } from "../../context/AdminSearchContext";
 
 const AdminCustomers = () => {
     const theme = useTheme();
@@ -12,6 +13,8 @@ const AdminCustomers = () => {
 
     const [clients, setClients] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    const { search } = useAdminSearch();
 
     useEffect(() => {
         const loadClients = async () => {
@@ -66,6 +69,10 @@ const AdminCustomers = () => {
         { field: "ordersCount", headerName: "Количество заказов", flex: 1 },
     ];
 
+    const filteredClients = clients.filter((client) => {
+        return client.name.toLowerCase().includes(search.toLowerCase());
+    });
+
     return (
         <Box m="20px">
             <Header title="КЛИЕНТЫ" subtitle="Управление клиентами и их данными" />
@@ -109,7 +116,7 @@ const AdminCustomers = () => {
 
                 <DataGrid 
                   checkboxSelection 
-                  rows={clients} 
+                  rows={filteredClients} 
                   columns={columns} 
                   loading={loading}
                   showToolbar 

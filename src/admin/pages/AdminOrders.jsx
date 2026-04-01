@@ -1,5 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
-import { Box, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  Typography,
+  useTheme,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Divider,
+} from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import axios from "axios";
 import { tokens } from "../../theme";
@@ -8,6 +16,7 @@ import {
   getAllOrders,
   updateOrderStatus,
 } from "../../api/ordersApi";
+import { useAdminSearch } from "../../context/AdminSearchContext";
 
 const STATUS_ORDER = ["new", "in_progress", "ready", "completed", "cancelled"];
 
@@ -30,6 +39,9 @@ const AdminOrders = () => {
   const colors = tokens(theme.palette.mode);
 
   const [rows, setRows] = useState([]);
+  const [selectedOrder, setSelectedOrder] = useState(null); 
+
+  const { search } = useAdminSearch();  
 
   useEffect(() => {
   const loadOrders = async () => {
@@ -42,10 +54,16 @@ const AdminOrders = () => {
         customerPhone: order.client?.phone || "Не указано",
         customerEmail: order.client?.email || "Не указано",
         total: Number(order.totalAmount || 0),
+        subtotalAmount: Number(order.subtotalAmount || order.totalAmount || 0),
+        discountAmount: Number(order.discountAmount || 0),
+        promotionTitle: order.promotionTitle || null,
+        promoCode: order.promoCode || null,
+        giftLabel: order.giftLabel || null,
         status: order.status || "new",
         createdAt: order.createdAt,
         pickupTime: order.pickupTime,
         items: order.items || [],
+        raw: order,
       }));
 
       setRows(mappedOrders);
@@ -63,7 +81,6 @@ useEffect(() => {
   const markOrdersAsViewed = async () => {
     try {
       await axios.put("http://localhost:5000/api/orders/mark-viewed");
-      console.log("mark-viewed response:", res.data);
     } catch (error) {
       console.error("Ошибка при обновлении заказов:", error);
     }
@@ -83,15 +100,24 @@ useEffect(() => {
     const updatedOrder = await updateOrderStatus(id, nextStatus);
 
     setRows((prev) =>
-      prev.map((item) =>
-        String(item.id) === String(id)
-          ? {
-              ...item,
-              status: updatedOrder.status,
-            }
-          : item
-      )
-    );
+        prev.map((item) =>
+          String(item.id) === String(id)
+            ? {
+                ...item,
+                status: updatedOrder.status,
+                raw: updatedOrder,
+              }
+            : item
+        )
+      );
+
+      if (selectedOrder && String(selectedOrder.id) === String(id)) {
+        setSelectedOrder((prev) => ({
+          ...prev,
+          status: updatedOrder.status,
+          raw: updatedOrder,
+        }));
+      }
   } catch (error) {
     console.error("Ошибка обновления статуса:", error);
   }
@@ -182,7 +208,10 @@ useEffect(() => {
                 "&:hover": { opacity: 0.9 },
               }}
               title="Нажмите, чтобы изменить статус"
-              onClick={() => handleStatusChange(id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleStatusChange(id);
+              }}
             >
               <Typography sx={{fontSize: '12px'}} color={colors.grey[100]}>
                 {STATUS_LABELS[status] || status}
@@ -193,6 +222,20 @@ useEffect(() => {
       },
     ],
     [colors]
+  );
+
+  const filteredRows = rows.filter((row) => {
+   const q = search.toLowerCase().trim();
+    if (!q) return true;
+
+    return (
+      String(row.id || '').toLowerCase().includes(q) ||
+      String(row.customerName || '').toLowerCase().includes(q) ||
+      String(row.customerPhone || '').toLowerCase().includes(q) ||
+      String(row.customerEmail || '').toLowerCase().includes(q) ||
+      String(row.status || '').toLowerCase().includes(q)
+    );   
+  }
   );
 
   return (
@@ -239,9 +282,10 @@ useEffect(() => {
         <DataGrid
           checkboxSelection
           disableRowSelectionOnClick
-          rows={rows}
+          rows={filteredRows}
           columns={columns}
           showToolbar
+          onRowClick={(params) => setSelectedOrder(params.row)}
           slotProps={{
             toolbar: {
               csvOptions: {
@@ -252,6 +296,138 @@ useEffect(() => {
             },
           }}
         />
+        <Dialog 
+          open={Boolean(selectedOrder)}
+          onClose={() => setSelectedOrder(null)}
+          fullWidth
+          maxWidth="md"
+          
+          
+        >
+          {selectedOrder && (
+            <Box backgroundColor={colors.blueAccent[800]}>
+              <DialogTitle sx={{
+                fontSize: '40px'
+              }}
+              >
+                Заказ №{selectedOrder.id}</DialogTitle>
+
+              <DialogContent>
+                <Box display="grid" gap="10px" mb={2}>
+                  <Typography sx={{fontSize: '18px'}}>
+                    <b>Клиент:</b> {selectedOrder.customerName}
+                  </Typography>
+
+                  <Typography sx={{fontSize: '18px'}}>
+                    <b>Телефон:</b> {selectedOrder.customerPhone}
+                  </Typography>
+
+                  <Typography sx={{fontSize: '18px'}}>
+                    <b>Email:</b> {selectedOrder.customerEmail}
+                  </Typography>
+
+                  <Typography sx={{fontSize: '18px'}}>
+                    <b>Создан:</b>{" "}
+                    {selectedOrder.createdAt
+                      ? new Date(selectedOrder.createdAt).toLocaleString("ru-RU")
+                      : "—"}
+                  </Typography>
+
+                  <Typography sx={{fontSize: '18px'}}>
+                    <b>Самовывоз:</b>{" "}
+                    {selectedOrder.pickupTime
+                      ? new Date(selectedOrder.pickupTime).toLocaleString("ru-RU")
+                      : "Не указано"}
+                  </Typography>
+
+                  <Typography  sx={{fontSize: '18px'}}>
+                    <b>Статус:</b> {STATUS_LABELS[selectedOrder.status] || selectedOrder.status}
+                  </Typography>
+                </Box>
+
+                <Divider sx={{ my: 2 }} />
+
+                <Typography variant="h4" mb={2}>
+                  Состав заказа
+                </Typography>
+
+                <Box display="grid" gap="12px">
+                  {selectedOrder.items?.length ? (
+                    selectedOrder.items.map((item) => (
+                      <Box
+                        key={item.id}
+                        display="flex"
+                        justifyContent="space-between"
+                        alignItems="center"
+                        p={1.5}
+                        border="1px solid rgba(0,0,0,0.1)"
+                        borderRadius="8px"
+                      >
+                        <Box>
+                          <Typography fontWeight={600}>
+                            {item.product?.name || "Товар"}
+                          </Typography>
+
+                          <Typography variant="body2" color="text.secondary">
+                            {item.product?.category?.name || "Без категории"}
+                          </Typography>
+                        </Box>
+
+                        <Box textAlign="right">
+                          <Typography>{item.quantity} шт.</Typography>
+
+                          <Typography>
+                            {Number(item.unitPrice || item.product?.price || 0)} ₽ / шт.
+                          </Typography>
+
+                          <Typography fontWeight={700}>
+                            {Number(item.lineTotal || 0)} ₽
+                          </Typography>
+                        </Box>
+                      </Box>
+                    ))
+                  ) : (
+                    <Typography>Состав заказа отсутствует</Typography>
+                  )}
+                </Box>
+
+                <Divider sx={{ my: 2 }} />
+
+                <Box display="grid" gap="8px">
+                  <Typography sx={{fontSize: '18px'}}>
+                    <b>Сумма до скидки:</b> {selectedOrder.subtotalAmount} ₽
+                  </Typography>
+
+                  <Typography sx={{fontSize: '18px'}}>
+                    <b>Скидка:</b> {selectedOrder.discountAmount} ₽
+                  </Typography>
+
+                  {selectedOrder.promotionTitle && (
+                    <Typography sx={{fontSize: '18px'}}>
+                      <b>Акция:</b> {selectedOrder.promotionTitle}
+                    </Typography>
+                  )}
+
+                  {selectedOrder.promoCode && (
+                    <Typography sx={{fontSize: '18px'}}>
+                      <b>Промокод:</b> {selectedOrder.promoCode}
+                    </Typography>
+                  )}
+
+                  {selectedOrder.giftLabel && (
+                    <Typography sx={{fontSize: '18px'}}>
+                      <b>Подарок:</b> {selectedOrder.giftLabel}
+                    </Typography>
+                  )}
+
+                  <Typography variant="h3">
+                    <b>Итого:</b> {selectedOrder.total} ₽
+                  </Typography>
+                </Box>
+              </DialogContent>
+            </Box>
+          )}
+        </Dialog>
       </Box>
     </Box>
   );

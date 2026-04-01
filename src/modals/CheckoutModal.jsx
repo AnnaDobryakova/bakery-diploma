@@ -2,7 +2,7 @@ import { Box, Typography, Button, TextField } from "@mui/material";
 import ModalWrapper from "../modals/ModalWrapper";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import AuthModal from "./AuthModal";
@@ -12,25 +12,46 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import dayjs from "dayjs";
 import "dayjs/locale/ru";
 import { createOrder } from "../api/ordersApi";
-import { getProducts } from "../api/productsApi";
+import { getPromotions } from "../api/promotionsApi";
+import { applyPromotions } from "../utils/promotionEngine";
 
 dayjs.locale("ru");
 
 
 const CheckoutModal = ({ open, onClose, cartItems = [], removeFromCart, changeQuantity, clearCart}) => {
 
-
-  const total = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
-
   const [submitError, setSubmitError] = useState("");
   const navigate = useNavigate();
   const [pickupTime, setPickupTime] = useState(null);
+  const [promotions, setPromotions] = useState([]);
+  const [promoCode, setPromoCode] = useState("");
 
   const { user } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  const pricing = useMemo(() => {
+  return applyPromotions({
+    promotions,
+    cartItems,
+    promoCode,
+  });
+}, [promotions, cartItems, promoCode]);
+
+  useEffect(() => {
+  const loadPromotions = async () => {
+    try {
+      const data = await getPromotions();
+      setPromotions(data);
+    } catch (error) {
+      console.error("Ошибка загрузки акций:", error);
+      setPromotions([]);
+    }
+  };
+
+  if (open) {
+    loadPromotions();
+  }
+}, [open]);
 
 
 const handleCheckout = async () => {
@@ -56,6 +77,12 @@ const handleCheckout = async () => {
         productId: item.id,
         quantity: item.quantity,
       })),
+      subtotalAmount: pricing.subtotal,
+      discountAmount: pricing.discountAmount,
+      totalAmount: pricing.finalTotal,
+      promotionTitle: pricing.appliedPromotion?.title || null,
+      promoCode: pricing.appliedPromotion?.promoCode || null,
+      giftLabel: pricing.giftLabel || null,
       comment: "",
     };
 
@@ -144,19 +171,67 @@ const handleCheckout = async () => {
             </Box>
           </LocalizationProvider>
 
+          <Box sx={{ mt: 3 }}>
+            <TextField
+              fullWidth
+              label="Промокод"
+              value={promoCode}
+              onChange={(e) => setPromoCode(e.target.value)}
+              placeholder="Введите промокод, если он есть"
+            />
+          </Box>
+
           {submitError && (
               <Typography sx={{ color: "#d32f2f", fontSize: 13, mt: 1 }}>
                 {submitError}
               </Typography>
             )}
 
-          <Box sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}>
-            <Typography variant="h4" sx={{ mt: 2, fontWeight: 600 }}>
-              Итого:
-            </Typography>
-            <Typography variant="h6" sx={{ mt: 2 }}>
-              {total} ₽
-            </Typography>
+            {pricing.promoError && (
+              <Typography sx={{ color: "#d32f2f", fontSize: 13, mt: 1 }}>
+                {pricing.promoError}
+              </Typography>
+            )}
+
+          <Box sx={{ mt: 3, display: "grid", gap: 1 }}>
+            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+              <Typography>Сумма товаров:</Typography>
+              <Typography>{pricing.subtotal} ₽</Typography>
+            </Box>
+
+            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+              <Typography>Скидка:</Typography>
+              <Typography color={pricing.discountAmount > 0 ? "#2e7d32" : "inherit"}>
+                - {pricing.discountAmount} ₽
+              </Typography>
+            </Box>
+
+            {pricing.appliedPromotion && (
+              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Typography>Акция:</Typography>
+                <Typography sx={{ textAlign: "right", maxWidth: 220 }}>
+                  {pricing.appliedPromotion.title}
+                </Typography>
+              </Box>
+            )}
+
+            {pricing.giftLabel && (
+              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Typography>Подарок:</Typography>
+                <Typography sx={{ textAlign: "right", maxWidth: 220 }}>
+                  {pricing.giftLabel}
+                </Typography>
+              </Box>
+            )}
+
+            <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}>
+              <Typography variant="h4" sx={{ fontWeight: 600 }}>
+                Итого:
+              </Typography>
+              <Typography variant="h6">
+                {pricing.finalTotal} ₽
+              </Typography>
+            </Box>
           </Box>
 
           <Button
