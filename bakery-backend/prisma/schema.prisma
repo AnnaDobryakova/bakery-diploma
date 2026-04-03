@@ -54,6 +54,7 @@ model Order {
   giftLabel      String?
   comment        String?
   items          OrderItem[]
+  receipt        Receipt?
 }
 
 model OrderItem {
@@ -108,7 +109,16 @@ model Promotion {
   endDate      DateTime
   status       String
   restrictions String?
-  imageUrl     String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+}
+
+model Receipt {
+  id            Int      @id @default(autoincrement())
+  orderId       Int      @unique
+  receiptNumber String   @unique
+  issuedAt      DateTime @default(now())
+  totalAmount   Decimal  @db.Decimal(10, 2)
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }

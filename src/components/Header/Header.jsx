@@ -64,7 +64,8 @@ const handleLogoutClick = () => {
       <div className="container">
         <div className="header__inner">
           <div className="header_left">
-            <button className="header_logo" type="button" aria-label="На главную">
+            <Link to="/" className="header_logo_link" aria-label="На главную">
+              <button className="header_logo" type="button" aria-label="На главную">
               <svg
                 width="78"
                 height="78"
@@ -110,11 +111,13 @@ const handleLogoutClick = () => {
                 </defs>
               </svg>
             </button>
+            </Link>
+            
 
             {/* Бургер */}
             <button
               type="button"
-              className={isMenuOpen ? "burger open" : "burger"}
+              className={isMenuOpen ? "burger active" : "burger"}
               onClick={() => setIsMenuOpen((v) => !v)}
               aria-label="Открыть меню"
               aria-expanded={isMenuOpen}
@@ -126,7 +129,7 @@ const handleLogoutClick = () => {
           </div>
 
           {/* Мобильное меню */}
-          <div className={isMenuOpen ? "mobile_menu open" : "mobile_menu"}>
+          <div className={isMenuOpen ? "mobile_menu active" : "mobile_menu"}>
             <ul>
               <li>
                 <Link to="/" onClick={handleNavClick}>Главная</Link>

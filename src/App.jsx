@@ -21,6 +21,7 @@ import AdminRoute from "./admin/utils/AdminRoute";
 import AdminProductForm from "./admin/pages/products/AdminProductForm";
 import AdminCategoryForm from "./admin/pages/categories/AdminCategoryForm";
 import AdminPromotionForm from "./admin/pages/promotions/AdminPromotionForm";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 export default function App() {
     const [cartItems, setCartItems] = useState(() => {
@@ -109,6 +110,7 @@ export default function App() {
           />
         }
       />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route
         path="/account"
         element={

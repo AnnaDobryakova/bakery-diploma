@@ -306,32 +306,7 @@ const AdminPromotionForm = () => {
                 sx={{ gridColumn: "span 4" }}
               />
 
-              <Box sx={{ gridColumn: "span 4" }}>
-                <Button variant="contained" component="label" color="secondary">
-                    Загрузить фото
-                    <input
-                    hidden
-                    type="file"
-                    accept="image/*"
-                    onChange={(event) => handleImageChange(event, setFieldValue)}
-                    />
-                </Button>
-
-                {values.imageUrl && (
-                    <Box mt="15px">
-                    <img
-                        src={values.imageUrl}
-                        alt="preview"
-                        style={{
-                        width: "160px",
-                        height: "160px",
-                        objectFit: "cover",
-                        borderRadius: "8px",
-                        }}
-                    />
-                    </Box>
-                )}
-                </Box>
+              
             </Box>
 
             <Box display="flex" justifyContent="end" gap="10px" mt="20px">

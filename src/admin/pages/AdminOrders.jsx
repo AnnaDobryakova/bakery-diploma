@@ -48,7 +48,29 @@ const AdminOrders = () => {
     try {
       const orders = await getAllOrders();
 
-      const mappedOrders = orders.map((order) => ({
+      const mappedOrders = orders.map((order) => {
+      const items = order.items || [];
+
+      const itemsText = items.length
+        ? items
+            .map(
+              (item) =>
+                `${item.product?.name || "Товар"} × ${item.quantity}`
+            )
+            .join(", ")
+        : "—";
+
+      const createdAtText = order.createdAt
+        ? new Date(order.createdAt).toLocaleString("ru-RU")
+        : "—";
+
+      const pickupTimeText = order.pickupTime
+        ? new Date(order.pickupTime).toLocaleString("ru-RU")
+        : "Не указано";
+
+      const statusText = STATUS_LABELS[order.status] || order.status || "—";
+
+      return {
         id: order.id,
         customerName: order.client?.fullName || "Не указано",
         customerPhone: order.client?.phone || "Не указано",
@@ -60,11 +82,16 @@ const AdminOrders = () => {
         promoCode: order.promoCode || null,
         giftLabel: order.giftLabel || null,
         status: order.status || "new",
+        statusText,
         createdAt: order.createdAt,
+        createdAtText,
         pickupTime: order.pickupTime,
-        items: order.items || [],
+        pickupTimeText,
+        items,
+        itemsText,
         raw: order,
-      }));
+      };
+    });
 
       setRows(mappedOrders);
     } catch (error) {
@@ -100,21 +127,23 @@ useEffect(() => {
     const updatedOrder = await updateOrderStatus(id, nextStatus);
 
     setRows((prev) =>
-        prev.map((item) =>
-          String(item.id) === String(id)
-            ? {
-                ...item,
-                status: updatedOrder.status,
-                raw: updatedOrder,
-              }
-            : item
-        )
-      );
+      prev.map((item) =>
+        String(item.id) === String(id)
+          ? {
+              ...item,
+              status: updatedOrder.status,
+              statusText: STATUS_LABELS[updatedOrder.status] || updatedOrder.status,
+              raw: updatedOrder,
+            }
+          : item
+      )
+    );
 
       if (selectedOrder && String(selectedOrder.id) === String(id)) {
         setSelectedOrder((prev) => ({
           ...prev,
           status: updatedOrder.status,
+          statusText: STATUS_LABELS[updatedOrder.status] || updatedOrder.status,
           raw: updatedOrder,
         }));
       }
@@ -162,31 +191,23 @@ useEffect(() => {
         renderCell: ({ value }) => `${value} ₽`,
       },
       {
-        field: "createdAt",
+        field: "createdAtText",
         headerName: "Создан",
         flex: 1.2,
-        renderCell: ({ value }) =>
-          value ? new Date(value).toLocaleString("ru-RU") : "—",
       },
       {
-        field: "pickupTime",
+        field: "pickupTimeText",
         headerName: "Самовывоз",
         flex: 1.2,
-        renderCell: ({ value }) =>
-          value ? new Date(value).toLocaleString("ru-RU") : "Не указано",
       },
       {
-        field: "items",
+        field: "itemsText",
         headerName: "Состав",
         flex: 1.5,
         sortable: false,
-        renderCell: ({ value }) => {
-          if (!value?.length) return "—";
-          return value.map((item) => `${item.product?.name || "Товар"} × ${item.quantity}`).join(", ");
-        },
       },
       {
-        field: "status",
+        field: "statusText",
         headerName: "Статус",
         flex: 1,
         renderCell: ({ row }) => {
@@ -213,7 +234,7 @@ useEffect(() => {
                 handleStatusChange(id);
               }}
             >
-              <Typography sx={{fontSize: '12px'}} color={colors.grey[100]}>
+              <Typography sx={{ fontSize: "12px" }} color={colors.grey[100]}>
                 {STATUS_LABELS[status] || status}
               </Typography>
             </Box>
@@ -343,6 +364,33 @@ useEffect(() => {
                   <Typography  sx={{fontSize: '18px'}}>
                     <b>Статус:</b> {STATUS_LABELS[selectedOrder.status] || selectedOrder.status}
                   </Typography>
+
+                  {selectedOrder.receipt && (
+                    <>
+                      <Divider sx={{ my: 2 }} />
+
+                      <Typography variant="h4" mb={2}>
+                        Данные чека
+                      </Typography>
+
+                      <Box display="grid" gap="10px" mb={2}>
+                        <Typography sx={{ fontSize: "18px" }}>
+                          <b>Номер чека:</b> {selectedOrder.receipt.receiptNumber}
+                        </Typography>
+
+                        <Typography sx={{ fontSize: "18px" }}>
+                          <b>Дата и время выдачи:</b>{" "}
+                          {selectedOrder.receipt.issuedAt
+                            ? new Date(selectedOrder.receipt.issuedAt).toLocaleString("ru-RU")
+                            : "—"}
+                        </Typography>
+
+                        <Typography sx={{ fontSize: "18px" }}>
+                          <b>Сумма по чеку:</b> {Number(selectedOrder.receipt.totalAmount)} ₽
+                        </Typography>
+                      </Box>
+                    </>
+                  )}
                 </Box>
 
                 <Divider sx={{ my: 2 }} />

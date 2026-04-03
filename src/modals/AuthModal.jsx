@@ -3,6 +3,7 @@ import { useNavigate, } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import ModalWrapper from "./ModalWrapper";
 import { Box, Typography, Button, TextField, Checkbox, FormControlLabel } from "@mui/material";
+import { Link } from "react-router-dom";
 
 const textFieldStyle = {
   "& .MuiInputLabel-root.Mui-focused": { color: "#FD8719" },
@@ -195,7 +196,21 @@ const AuthModal = ({ open, onClose }) => {
                 {mode === "register" && (
                     <FormControlLabel
                         control={<Checkbox checked={form.consent} onChange={handleConsentChange} />}
-                        label="Я согласен(на) на обработку персональных данных"
+                        label={
+                          <span>
+                            Я согласен(на) с{" "}
+                            <Link
+                              to="/privacy"
+                              target="_blank"
+                              style={{
+                                color: "#1976d2",
+                                textDecoration: "underline",
+                              }}
+                            >
+                              политикой конфиденциальности
+                            </Link>
+                          </span>
+                        }
                     />
                 )}
 

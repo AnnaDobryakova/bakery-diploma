@@ -108,13 +108,34 @@ const handleCheckout = async () => {
 
   return (
     <ModalWrapper open={open} onClose={onClose} maxWidth={980} padding={0}>
-      <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", minHeight: 520 }}>
-        <Box sx={{ minWidth: '500px', bgcolor: "#FFF7EF", p: 5 }}>
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: { xs: "1fr", md: "1fr" },
+          minHeight: { xs: "auto", md: 520 },
+        }}
+      >
+        <Box
+          sx={{
+            width: "100%",
+            bgcolor: "#FFF7EF",
+            p: { xs: 2, sm: 3, md: 5 },
+            borderRadius: "16px",
+          }}
+        >
           <Typography variant="h5" sx={{ mt: 2, fontWeight: 600 }}>
             Корзина
           </Typography>
 
-          <Box sx={{ borderTop: "1px solid rgba(0,0,0,0.4)", pt: 2, maxHeight: 280, overflowY: "auto", pr: 1, }}>
+          <Box
+            sx={{
+              borderTop: "1px solid rgba(0,0,0,0.4)",
+              pt: 2,
+              maxHeight: { xs: 220, md: 280 },
+              overflowY: "auto",
+              pr: 1,
+            }}
+          >
             {cartItems.length === 0 ? (
               <Typography sx={{ opacity: 0.7 }}>Корзина пуста</Typography>
             ) : (
@@ -122,9 +143,10 @@ const handleCheckout = async () => {
                 <Box
                   key={item.id}
                   sx={{
-                    display: "flex",
+                    display: "grid",
+                    gridTemplateColumns: { xs: "52px 1fr", sm: "52px 1fr auto" },
                     alignItems: "center",
-                    gap: 2,
+                    gap: 1.5,
                     py: 2,
                     borderBottom: "1px solid rgba(0,0,0,0.08)",
                   }}
@@ -135,16 +157,37 @@ const handleCheckout = async () => {
                     alt={item.name}
                     sx={{ width: 52, height: 52, borderRadius: 2, objectFit: "cover" }}
                   />
-                  <Box sx={{ flex: 1 }}>
-                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                  <Box sx={{ minWidth: 0 }}>
+                    <Typography
+                      sx={{
+                        fontWeight: 600,
+                        fontSize: { xs: "15px", md: "18px" },
+                        lineHeight: 1.3,
+                        wordBreak: "break-word",
+                      }}
+                    >
                       {item.name}
                     </Typography>
-                    <Typography variant="h6" sx={{ opacity: 0.7 }}>
+                    <Typography
+                      sx={{
+                        opacity: 0.7,
+                        fontSize: { xs: "14px", md: "16px" },
+                      }}
+                    >
                       {item.price} ₽
                     </Typography>
                   </Box>
 
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }} className="menu_count">
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      justifySelf: { xs: "start", sm: "end" },
+                      mt: { xs: 1, sm: 0 },
+                    }}
+                    className="menu_count"
+                  >
                     <button className="menu_btn"  onClick={() => changeQuantity(item.id, -1)}>
                       <RemoveIcon sx={{ fontSize: 20  }} />
                     </button>
@@ -193,7 +236,7 @@ const handleCheckout = async () => {
               </Typography>
             )}
 
-          <Box sx={{ mt: 3, display: "grid", gap: 1 }}>
+          <Box sx={{ mt: 3, display: "grid", gap: 1.2 }}>
             <Box sx={{ display: "flex", justifyContent: "space-between" }}>
               <Typography>Сумма товаров:</Typography>
               <Typography>{pricing.subtotal} ₽</Typography>
@@ -235,23 +278,22 @@ const handleCheckout = async () => {
           </Box>
 
           <Button
-          
-          onClick={handleCheckout}
-              disabled={!cartItems.length}
-              variant="contained"
-              type="button"
-              sx={{
-                backgroundColor: "#FD8719",
-                borderRadius: "64px",
-                textTransform: "initial",
-                width: "100%",
-                mt: 1,
-              }}
-              
-            >
-              Оформить заказ
-              
-            </Button>
+            onClick={handleCheckout}
+            disabled={!cartItems.length}
+            variant="contained"
+            type="button"
+            sx={{
+              backgroundColor: "#FD8719",
+              borderRadius: "64px",
+              textTransform: "initial",
+              width: "100%",
+              mt: 2,
+              height: { xs: "46px", md: "52px" },
+              fontSize: { xs: "15px", md: "17px" },
+            }}
+          >
+            Оформить заказ
+          </Button>
 
 
             <AuthModal

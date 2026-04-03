@@ -19,7 +19,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Header from "../../components/Header";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { useAdminSearch } from "../../../context/AdminSearchContext";
 
@@ -69,67 +69,137 @@ const AdminEmployees = () => {
         }
     };
 
-    const columns = [
-        { field: "id", headerName: "ID"},
-        { field: "firstName", headerName: "Имя", flex: 1, cellClassName: "name-column--cell" },
-        { field: "lastName", headerName: "Фамилия", flex: 1, cellClassName: "name-column--cell" },
-        { field: "age", headerName: "Возраст", type: "number", headerAlign: "left", align: "left" },
-        { field: "phone", headerName: "Телефон", flex: 1 },
-        { field: "email", headerName: "Email", flex: 1 },
-        { 
-            field: "position", 
-            headerName: "Должность", 
-            flex: 1,
-            align: "center", 
-            headerAlign: "center",
-            renderCell: ({ row: { position } }) => {
-                return (
-                    <Box width="80%" m="10px auto" p="5px" display="flex" alignItems="center" justifyContent="center" 
-                    backgroundColor={
-                        position === "Администратор"
-                        ? colors.greenAccent[700]
-                        : colors.greenAccent[700]
-                    }
-                    borderRadius="4px"
-                    >
-                        {position === "Администратор" && <AdminPanelSettingsOutlinedIcon/>}
-                        {position === "Менеджер" && <SecurityOutlinedIcon />}
-                        {position === "Пекарь" && <LockOpenOutlinedIcon />}
-                        {position === "Кассир" && <LockOpenOutlinedIcon />}
-                        <Typography color={colors.grey[100]} sx={{ ml: "5px", fontSize: "12px" }}>
-                            {position}
-                        </Typography>
-                    </Box>
-                );
-             
-            },
-        },
-        { field: "status", 
-            headerName: "Статус", 
-            flex: 1,
-            align: "center", 
-            headerAlign: "center",
-            renderCell: ({ row: { status } }) => {
-                return (
-                    <Box width="60%" m="10px auto" p="5px" display="flex" alignItems="center" justifyContent="center" 
-                    backgroundColor={
-                        status === "Активен"
-                        ? colors.greenAccent[700]
-                        : colors.redAccent[700]
-                    }
-                    borderRadius="4px"
-                    >
-                        <Typography color={colors.grey[100]}>
-                            {status}
-                        </Typography>
-                    </Box>
-                );
-             
-            },
-        },
-    ];
+    const mappedEmployees = useMemo(() => {
+        return employees.map((employee) => ({
+            id: employee.id,
+            firstName: employee.firstName || "—",
+            lastName: employee.lastName || "—",
+            age: employee.age ?? "—",
+            phone: employee.phone || "—",
+            email: employee.email || "—",
+            position: employee.position || "—",
+            positionText: employee.position || "—",
+            status: employee.status || "—",
+            statusText: employee.status || "—",
+        }));
+    }, [employees]);
 
-    const filteredEmployees = employees.filter((employee) => employee.firstName.toLowerCase().includes(search.toLowerCase()) || employee.lastName.toLowerCase().includes(search.toLowerCase()));
+    const columns = useMemo(
+  () => [
+    { field: "id", headerName: "ID", flex: 0.6 },
+    {
+      field: "firstName",
+      headerName: "Имя",
+      flex: 1,
+      cellClassName: "name-column--cell",
+    },
+    {
+      field: "lastName",
+      headerName: "Фамилия",
+      flex: 1,
+      cellClassName: "name-column--cell",
+    },
+    {
+      field: "age",
+      headerName: "Возраст",
+      type: "number",
+      flex: 0.8,
+      headerAlign: "left",
+      align: "left",
+    },
+    {
+      field: "phone",
+      headerName: "Телефон",
+      flex: 1,
+    },
+    {
+      field: "email",
+      headerName: "Email",
+      flex: 1.2,
+    },
+    {
+      field: "positionText",
+      headerName: "Должность",
+      flex: 1,
+      align: "center",
+      headerAlign: "center",
+      renderCell: ({ row }) => {
+        const position = row.position;
+
+        return (
+          <Box
+            width="80%"
+            m="10px auto"
+            p="5px"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            backgroundColor={colors.greenAccent[700]}
+            borderRadius="4px"
+          >
+            {position === "Администратор" && <AdminPanelSettingsOutlinedIcon />}
+            {position === "Менеджер" && <SecurityOutlinedIcon />}
+            {(position === "Пекарь" || position === "Кассир") && (
+              <LockOpenOutlinedIcon />
+            )}
+            <Typography
+              color={colors.grey[100]}
+              sx={{ ml: "5px", fontSize: "12px" }}
+            >
+              {position}
+            </Typography>
+          </Box>
+        );
+      },
+    },
+    {
+      field: "statusText",
+      headerName: "Статус",
+      flex: 1,
+      align: "center",
+      headerAlign: "center",
+      renderCell: ({ row }) => {
+        const status = row.status;
+
+        return (
+          <Box
+            width="60%"
+            m="10px auto"
+            p="5px"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            backgroundColor={
+              status === "Активен"
+                ? colors.greenAccent[700]
+                : colors.redAccent[700]
+            }
+            borderRadius="4px"
+          >
+            <Typography color={colors.grey[100]}>
+              {status}
+            </Typography>
+          </Box>
+        );
+      },
+    },
+  ],
+  [colors]
+);
+
+    const filteredEmployees = mappedEmployees.filter((employee) => {
+  const q = search.toLowerCase().trim();
+  if (!q) return true;
+
+  return (
+    String(employee.firstName || "").toLowerCase().includes(q) ||
+    String(employee.lastName || "").toLowerCase().includes(q) ||
+    String(employee.phone || "").toLowerCase().includes(q) ||
+    String(employee.email || "").toLowerCase().includes(q) ||
+    String(employee.positionText || "").toLowerCase().includes(q) ||
+    String(employee.statusText || "").toLowerCase().includes(q)
+  );
+});
 
     return (
         <Box m="20px">
@@ -205,10 +275,10 @@ const AdminEmployees = () => {
                         </Button>
                     </Box>
 
-                    <DataGrid 
+                    <DataGrid
                         checkboxSelection
-                        showToolbar 
-                        rows={filteredEmployees} 
+                        showToolbar
+                        rows={filteredEmployees}
                         columns={columns}
                         onRowSelectionModelChange={(newSelection) => {
                             const idsArray =
@@ -218,7 +288,16 @@ const AdminEmployees = () => {
 
                             setSelectedEmployeeIds(idsArray);
                         }}
-                    />
+                        slotProps={{
+                            toolbar: {
+                            csvOptions: {
+                                fileName: "Сотрудники_пекарни",
+                                delimiter: ";",
+                                utf8WithBom: true,
+                            },
+                            },
+                        }}
+                        />
                     <Dialog open={deleteDialogOpen} onClose={handleCloseDeleteDialog}>
                     <DialogTitle>Удаление сотрудника</DialogTitle>
                     <DialogContent>

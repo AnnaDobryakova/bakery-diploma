@@ -1,84 +1,106 @@
 import { Box, Typography } from "@mui/material";
 
-const PromotionsSection = ({ promotions = [] }) => {
+const PromotionsSection = ({ promotions = [], id }) => {
   if (!promotions.length) return null;
 
   return (
-    <Box sx={{ px: 4, py: 6 }}>
+    <Box
+      component="section"
+      id={id}
+      sx={{
+        width: "100%",
+        maxWidth: "1280px",
+        margin: "0 auto",
+        padding: { xs: "0 20px", md: "0 20px" },
+      }}
+    >
       <Typography
         variant="h2"
         sx={{
           textAlign: "center",
-          mb: 5,
+          fontSize: { xs: "42px", md: "75px" },
           fontWeight: 500,
+          mb: { xs: 4, md: 10 },
         }}
       >
         Акции
       </Typography>
 
       <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        justifyContent: 'space-around',
-      }}    
+        sx={{
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "1fr",
+            sm: "1fr",
+            md: "repeat(2, minmax(280px, 1fr))",
+            lg: "repeat(3, minmax(280px, 1fr))",
+          },
+          gap: { xs: 3, md: 4 },
+          alignItems: "stretch",
+        }}
       >
-        {promotions.map((promotion) => (
+        {promotions.map((promo) => (
           <Box
-            key={promotion.id}
+            key={promo.id}
             sx={{
-              width: "100%",
-              maxWidth: 360,
+              backgroundColor: "#FFF7EF",
+              borderRadius: "20px",
+              padding: { xs: "20px", md: "24px" },
+              minHeight: { xs: "220px", md: "260px" },
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              boxShadow: "0 6px 20px rgba(0,0,0,0.06)",
             }}
           >
-            <Box
-              component="img"
-              src={promotion.imageUrl || "/images/promotions/default.jpg"}
-              alt={promotion.title}
-              sx={{
-                width: "100%",
-                height: 320,
-                objectFit: "cover",
-                borderRadius: "16px",
-                display: "block",
-              }}
-            />
-
-            <Typography
-              sx={{
-                mt: 2,
-                fontSize: "2rem",
-                fontWeight: 700,
-                lineHeight: 1.2,
-              }}
-            >
-              {promotion.title}
-            </Typography>
-
-            <Typography
-              sx={{
-                mt: 1,
-                fontSize: "1rem",
-                color: "text.secondary",
-                lineHeight: 1.4,
-              }}
-            >
-              {promotion.restrictions || "Без дополнительных ограничений"}
-            </Typography>
-            {promotion.promoCode && (
+            <Box>
               <Typography
                 sx={{
-                  mt: 1,
-                  fontSize: "1rem",
+                  fontSize: { xs: "26px", md: "34px" },
                   fontWeight: 700,
-                  color: "#FD8719",
-                  lineHeight: 1.4,
+                  lineHeight: 1.15,
+                  mb: 1.5,
+                  color: "#111",
+                  wordBreak: "break-word",
                 }}
               >
-                Промокод: {promotion.promoCode}
+                {promo.title}
               </Typography>
-            )}
+
+              {promo.description && (
+                <Typography
+                  sx={{
+                    fontSize: { xs: "15px", md: "17px" },
+                    lineHeight: 1.5,
+                    color: "#444",
+                    mb: 2,
+                    wordBreak: "break-word",
+                  }}
+                >
+                  {promo.description}
+                </Typography>
+              )}
+            </Box>
+
+            <Box sx={{ display: "grid", gap: 1 }}>
+              {promo.categoryName && (
+                <Typography sx={{ fontSize: "14px", color: "#666" }}>
+                  <b>Категория:</b> {promo.categoryName}
+                </Typography>
+              )}
+
+              {promo.promoCode && (
+                <Typography sx={{ fontSize: "14px", color: "#666" }}>
+                  <b>Промокод:</b> {promo.promoCode}
+                </Typography>
+              )}
+
+              {promo.discountType && (
+                <Typography sx={{ fontSize: "14px", color: "#666" }}>
+                  <b>Тип скидки:</b> {promo.discountType}
+                </Typography>
+              )}
+            </Box>
           </Box>
         ))}
       </Box>

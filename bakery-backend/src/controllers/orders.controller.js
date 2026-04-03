@@ -138,6 +138,7 @@ export const getAllOrders = async (req, res) => {
     const orders = await prisma.order.findMany({
       include: {
         client: true,
+        receipt: true,
         items: {
           include: {
             product: {
@@ -181,6 +182,8 @@ export const getOrdersByEmail = async (req, res) => {
     const orders = await prisma.order.findMany({
       where: { clientId: client.id },
       include: {
+        client: true,
+        receipt: true,
         items: {
           include: {
             product: {
@@ -190,7 +193,6 @@ export const getOrdersByEmail = async (req, res) => {
             },
           },
         },
-        client: true,
       },
       orderBy: {
         createdAt: "desc",
@@ -209,7 +211,7 @@ export const getOrdersByEmail = async (req, res) => {
 export const updateOrderStatus = async (req, res) => {
   try {
     const { id } = req.params;
-    const { status } = req.body;
+    const { status, paymentMethod } = req.body;
 
     if (!id) {
       return res.status(400).json({ message: "Не передан id заказа" });
@@ -219,21 +221,68 @@ export const updateOrderStatus = async (req, res) => {
       return res.status(400).json({ message: "Не передан новый статус" });
     }
 
-    const updatedOrder = await prisma.order.update({
-      where: { id: Number(id) },
-      data: { status },
-      include: {
-        client: true,
-        items: {
-          include: {
-            product: {
-              include: {
-                category: true,
+    const orderId = Number(id);
+
+    const updatedOrder = await prisma.$transaction(async (tx) => {
+      const existingOrder = await tx.order.findUnique({
+        where: { id: orderId },
+        include: {
+          client: true,
+          items: {
+            include: {
+              product: {
+                include: {
+                  category: true,
+                },
               },
             },
           },
+          receipt: true,
         },
-      },
+      });
+
+      if (!existingOrder) {
+        throw new Error("Заказ не найден");
+      }
+
+      const order = await tx.order.update({
+        where: { id: orderId },
+        data: { status },
+        include: {
+          client: true,
+          items: {
+            include: {
+              product: {
+                include: {
+                  category: true,
+                },
+              },
+            },
+          },
+          receipt: true,
+        },
+      });
+
+      if (status === "completed" && !existingOrder.receipt) {
+        const now = new Date();
+
+        const receipt = await tx.receipt.create({
+          data: {
+            orderId: order.id,
+            receiptNumber: `CHK-${order.id}-${now.getTime()}`,
+            issuedAt: now,
+            totalAmount: order.totalAmount,
+            paymentMethod: paymentMethod || "Наличными",
+          },
+        });
+
+        return {
+          ...order,
+          receipt,
+        };
+      }
+
+      return order;
     });
 
     return res.status(200).json(updatedOrder);

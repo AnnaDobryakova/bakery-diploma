@@ -71,7 +71,9 @@ const HomePage = ({ cartItems, removeFromCart, changeQuantity, clearCart }) => {
                 <p>Для нас выпечка – это не просто еда, а настоящее искусство, созданное с душой. Приглашаем вас в
                     уютное гастрономическое путешествие, где каждый кусочек – это встреча с теплом, качеством и
                     безупречным вкусом.</p>
-                <button className="button button_hero">Выбрать выпечку</button>
+                <a href="/menu" className="button button_hero" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
+                    Выбрать выпечку
+                </a>
             </div>
         </div>
       </section>
@@ -132,9 +134,20 @@ const HomePage = ({ cartItems, removeFromCart, changeQuantity, clearCart }) => {
                             <img src={product.imageURL} alt={product.name}/>
                             <h4 className="gallery_title">{product.name}</h4>
                             <p className="gallery_subtitle">{product.price} руб.</p>
-                            <button className="button button_gallery" onClick={handleNavClick}>
-                                <a href="/menu" style={{textDecoration: 'none', color: 'white'}}>Перейти в каталог</a>
-                            </button>
+                            <a
+                                href="/menu"
+                                className="button button_gallery"
+                                onClick={handleNavClick}
+                                style={{
+                                    textDecoration: "none",
+                                    color: "white",
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                }}
+                                >
+                                Перейти в каталог
+                            </a>
                         </div>
                     ))}
                 </div>
