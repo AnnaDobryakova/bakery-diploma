@@ -1,4 +1,6 @@
-const API_URL = "http://localhost:5000/api/promotions";
+import { buildApiUrl } from "./apiBase";
+
+const API_URL = buildApiUrl("/api/promotions");
 
 export const getPromotions = async () => {
   const response = await fetch(API_URL);

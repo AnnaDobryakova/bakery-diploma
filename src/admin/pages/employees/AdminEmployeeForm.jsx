@@ -6,7 +6,7 @@ import Header from "../../components/Header";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-
+import { buildApiUrl } from "../../../api/apiBase";
 
 const phoneRegExp = /^(\+7|8)[\s-]?\(?\d{3}\)?[\s-]?\d{3}[\s-]?\d{2}[\s-]?\d{2}$/;
 
@@ -51,7 +51,7 @@ const AdminEmployeeForm = () => {
 
     const fetchEmployee = async () => {
         try {
-        const res = await axios.get(`http://localhost:5000/api/employees/${id}`);
+        const res = await axios.get(buildApiUrl(`/api/employees/${id}`));
         const employee = res.data;
 
         setInitialValues({
@@ -83,9 +83,9 @@ const AdminEmployeeForm = () => {
     };
 
     if (isEditMode) {
-      await axios.put(`http://localhost:5000/api/employees/${id}`, payload);
+      await axios.put(buildApiUrl(`/api/employees/${id}`), payload);
     } else {
-      await axios.post("http://localhost:5000/api/employees", {
+      await axios.post(buildApiUrl("/api/employees"), {
         ...payload,
         status: "Активен",
       });

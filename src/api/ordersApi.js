@@ -1,5 +1,9 @@
+import { buildApiUrl } from "./apiBase";
+
+const ORDERS_URL = buildApiUrl("/api/orders");
+
 export const createOrder = async (orderData) => {
-  const response = await fetch("http://localhost:5000/api/orders", {
+  const response = await fetch(ORDERS_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -15,16 +19,18 @@ export const createOrder = async (orderData) => {
 };
 
 export const getAllOrders = async () => {
-  const response = await fetch("http://localhost:5000/api/orders");
+  const response = await fetch(ORDERS_URL);
+
   if (!response.ok) {
     throw new Error("Не удалось получить заказы");
   }
+
   return response.json();
 };
 
 export const getOrdersByEmail = async (email) => {
   const response = await fetch(
-    `http://localhost:5000/api/orders/by-email?email=${encodeURIComponent(email)}`
+    `${ORDERS_URL}/by-email?email=${encodeURIComponent(email)}`
   );
 
   if (!response.ok) {
@@ -35,7 +41,7 @@ export const getOrdersByEmail = async (email) => {
 };
 
 export const updateOrderStatus = async (id, status) => {
-  const response = await fetch(`http://localhost:5000/api/orders/${id}/status`, {
+  const response = await fetch(`${ORDERS_URL}/${id}/status`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",

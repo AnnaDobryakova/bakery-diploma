@@ -43,6 +43,14 @@ const LineChart = ({ data = [] }) => {
             strokeWidth: 1,
           },
         },
+        crosshair: {
+          line: {
+            stroke: '#fff',
+            strokeWidth: 1,
+            strokeOpacity: 0.5,
+            strokeDasharray: '6 6',
+          }
+        },
         tooltip: {
           container: {
             color: "#000000",
@@ -111,6 +119,7 @@ const LineChart = ({ data = [] }) => {
           </Typography>
         </Box>
       )}
+      
       legends={[
         {
           anchor: "bottom-right",

@@ -1,4 +1,6 @@
-const API_URL = "http://localhost:5000/api/products";
+import { buildApiUrl } from "./apiBase";
+
+const API_URL = buildApiUrl("/api/products");
 
 const normalizeProduct = (product) => ({
   id: product.id,

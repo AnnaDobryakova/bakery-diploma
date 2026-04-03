@@ -211,7 +211,7 @@ export const getOrdersByEmail = async (req, res) => {
 export const updateOrderStatus = async (req, res) => {
   try {
     const { id } = req.params;
-    const { status, paymentMethod } = req.body;
+    const { status } = req.body;
 
     if (!id) {
       return res.status(400).json({ message: "Не передан id заказа" });
@@ -272,7 +272,6 @@ export const updateOrderStatus = async (req, res) => {
             receiptNumber: `CHK-${order.id}-${now.getTime()}`,
             issuedAt: now,
             totalAmount: order.totalAmount,
-            paymentMethod: paymentMethod || "Наличными",
           },
         });
 

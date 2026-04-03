@@ -6,6 +6,7 @@ import BarChart from "../components/BarChart";
 import PieChart from "../components/PieChart";
 import LineChart from "../components/LineChart";
 import { exportToCsv } from "../utils/exportToCsv";
+import { buildApiUrl } from "../../api/apiBase";
 
 const ORDERED_WEEK_DAYS = [
   "Понедельник",
@@ -96,7 +97,7 @@ const AdminReports = () => {
         setLoading(true);
         setError("");
 
-        const response = await fetch("http://localhost:5000/api/orders");
+        const response = await fetch(buildApiUrl("/api/orders"));
         if (!response.ok) {
           throw new Error("Не удалось получить заказы");
         }

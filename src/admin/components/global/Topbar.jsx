@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
 import { useAdminSearch } from "../../../context/AdminSearchContext";
 import { useLocation } from "react-router-dom";
+import { buildApiUrl } from "../../../api/apiBase";
 
 const Topbar = () => {
     const theme = useTheme();
@@ -69,7 +70,7 @@ const handleLogoutClick = () => {
 useEffect(() => {
   const fetchOrders = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/orders");
+      const res = await axios.get(buildApiUrl("/api/orders"));
       console.log("orders response:", res.data);
 
       const orders = Array.isArray(res.data)

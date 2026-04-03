@@ -17,6 +17,7 @@ import {
   updateOrderStatus,
 } from "../../api/ordersApi";
 import { useAdminSearch } from "../../context/AdminSearchContext";
+import { buildApiUrl } from "../../api/apiBase";
 
 const STATUS_ORDER = ["new", "in_progress", "ready", "completed", "cancelled"];
 
@@ -107,7 +108,7 @@ const AdminOrders = () => {
 useEffect(() => {
   const markOrdersAsViewed = async () => {
     try {
-      await axios.put("http://localhost:5000/api/orders/mark-viewed");
+      await axios.put(buildApiUrl("/api/orders/mark-viewed"));
     } catch (error) {
       console.error("Ошибка при обновлении заказов:", error);
     }

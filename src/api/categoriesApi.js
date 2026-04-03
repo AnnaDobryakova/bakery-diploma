@@ -1,4 +1,6 @@
-const API_URL = "http://localhost:5000/api/categories";
+import { buildApiUrl } from "./apiBase";
+
+const API_URL = buildApiUrl("/api/categories");
 
 const normalizeCategory = (category) => ({
   id: category.id,

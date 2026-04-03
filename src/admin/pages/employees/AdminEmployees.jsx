@@ -22,6 +22,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { useAdminSearch } from "../../../context/AdminSearchContext";
+import { buildApiUrl } from "../../../api/apiBase";
 
 const AdminEmployees = () => {
     const theme = useTheme();
@@ -34,7 +35,7 @@ const AdminEmployees = () => {
     const { search } = useAdminSearch();
 
     useEffect(() => {
-        axios.get("http://localhost:5000/api/employees")
+        axios.get(buildApiUrl("/api/employees"))
             .then(res => setEmployees(res.data))
             .catch(err => console.error(err));
     }, []);
@@ -59,7 +60,7 @@ const AdminEmployees = () => {
         const employeeId = selectedEmployeeIds[0];
 
         try {
-            await axios.delete(`http://localhost:5000/api/employees/${employeeId}`);
+            await axios.delete(buildApiUrl(`/api/employees/${employeeId}`));
             setEmployees((prev) => prev.filter((employee) => employee.id !== employeeId));
             setSelectedEmployeeIds([]);
             setDeleteDialogOpen(false);
