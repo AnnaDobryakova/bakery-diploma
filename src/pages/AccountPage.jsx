@@ -100,6 +100,11 @@ const AccountPage = ({ cartItems, removeFromCart, changeQuantity, clearCart }) =
               "&:hover": {
                 opacity: 0.9,
               },
+              fontSize: {
+                xs: "14px",
+                sm: "17px",
+                md: "20px",
+              },
             }}
           >
             Редактировать профиль

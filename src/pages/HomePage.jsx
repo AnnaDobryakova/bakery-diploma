@@ -144,6 +144,11 @@ const HomePage = ({ cartItems, removeFromCart, changeQuantity, clearCart }) => {
                                     display: "inline-flex",
                                     alignItems: "center",
                                     justifyContent: "center",
+                                    fontSize: {
+                                        xs: "14px",
+                                        sm: "17px",
+                                        md: "20px",
+                                    },
                                 }}
                                 >
                                 Перейти в каталог
