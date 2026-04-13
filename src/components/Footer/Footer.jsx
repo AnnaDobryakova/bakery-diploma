@@ -127,12 +127,23 @@ const Footer = () => {
 
           <div className="footer_categories">
             <h5 className="footer_title">Категории</h5>
-            <ul className="footer_ul">
-              <li className="footer_li">Хлеб</li>
-              <li className="footer_li">Соленая выпечка</li>
-              <li className="footer_li">Сладкая выпечка</li>
-              <li className="footer_li">Напитки</li>
-            </ul>
+            <div className="footer_ul">
+              <Link to="/menu?category=Хлеб" className="footer_li">
+                Хлеб
+              </Link>
+
+              <Link to="/menu?category=Соленая выпечка" className="footer_li">
+                Соленая выпечка
+              </Link>
+
+              <Link to="/menu?category=Сладкая выпечка" className="footer_li">
+                Сладкая выпечка
+              </Link>
+
+              <Link to="/menu?category=Напитки" className="footer_li">
+                Напитки
+              </Link>
+            </div>
           </div>
         </div>
       </div>

@@ -1960,6 +1960,18 @@
   color: #FD8719;
 }
 
+.footer_li ,
+.footer_copyright ,
+.footer_logo {
+  text-decoration: none;
+  color: inherit;
+}
+
+.footer_li :hover,
+.footer_copyright :hover {
+  color: #FD8719;
+}
+
 @media (max-width: 768px) {
   .content {
     gap: 50px;
